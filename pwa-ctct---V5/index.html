@@ -60,21 +60,6 @@
     .btn--ghost:hover{ background:#FFD966; color:#7E120F; transform: translateY(-1px); }
     .hero-badge{display:inline-flex;align-items:center;gap:8px; padding:8px 14px;border-radius:999px; font-weight:700; color:#FFD966; background:rgba(255,217,102,.14); border:1px solid rgba(255,217,102,.35); backdrop-filter: blur(2px); margin-bottom: 10px;}
 
-    /* ===== KPI (số liệu thật) ===== */
-    .strip{padding:18px 0 6px}
-    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-    .kpi{background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:14px;padding:16px 14px;backdrop-filter:blur(var(--blur));text-align:center}
-    .kpi strong{display:block;font-size:28px}
-    .kpi span{opacity:.9}
-
-    /* ===== Lưới tính năng ===== */
-    .features{padding:28px 0 10px}
-    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-    .card{background:var(--card-bg);border:1px solid var(--card-stroke);border-radius:16px;padding:18px;backdrop-filter:blur(var(--blur));}
-    .card h3{margin:0 0 6px;font-size:18px}
-    .card p{margin:0;opacity:.92}
-    .ic{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px}
-
     /* ===== Footer chuyên nghiệp ===== */
     .pro-footer{margin-top: 24px; color:#f7f7f7;}
     .pro-footer .f-wave{display:block; width:100%; height:70px;}
@@ -90,6 +75,24 @@
 
     .hero-media{ display: none !important; }
     #userChip { display: none !important; } /* placeholder cũ nếu có */
+
+        /* ===== Footer mobile polish ===== */
+    @media (max-width: 900px){
+      /* Tăng đệm ngang container trong footer */
+      .pro-footer .f-panel .container{
+        padding-inline: clamp(16px, 5vw, 24px);  
+        border-top: 1px solid rgba(255,255,255,.12);
+        border-radius: 10px 10px 0 0;
+        box-shadow: 0 -6px 24px rgba(0,0,0,.18) inset; }
+
+      /* Tăng khoảng thở giữa các khối */
+      .pro-footer .f-grid{   gap: 16px;      }
+
+      /* Giữ nhịp dọc dễ đọc */
+      .pro-footer h4{ margin: 0 0 10px; }
+      .pro-footer p { margin: 6px 0; }    }
+    
+
   </style>
 
   <!-- Dò đường dẫn ảnh nền (chạy ở mọi môi trường) -->
@@ -192,7 +195,7 @@
     </nav>
   </aside>
 
-  <!-- HERO -->
+  <!-- HERO (giữ nguyên) -->
   <section class="hero">
     <div class="container hero__inner">
       <div>
@@ -207,27 +210,10 @@
     </div>
   </section>
 
-  <!-- KPI THỰC -->
-  <section class="strip">
-    <div class="container kpis">
-      <div class="kpi"><strong id="kpiSessions">0</strong><span>Lượt học/tháng</span></div>
-      <div class="kpi"><strong id="kpiCompletion">0%</strong><span>Tỷ lệ hoàn thành bài</span></div>
-      <div class="kpi"><strong id="kpiStartTime">0 phút</strong><span>Thời gian bắt đầu</span></div>
-      <div class="kpi"><strong id="kpiAi24">0</strong><span>Phiên hỏi đáp AI</span></div>
-    </div>
-  </section>
-
-  <!-- LƯỚI TÍNH NĂNG -->
-  <section class="features">
-    <div class="container grid">
-      <div class="card"><h3><span class="ic">📚</span>Học tập</h3><p>Tài liệu chuẩn hóa, phân theo chủ đề. Tìm kiếm nhanh.</p></div>
-      <div class="card"><h3><span class="ic">🧠</span>Ôn tập & Thi thử</h3><p>Ngân hàng câu hỏi bám sát chuẩn. Luyện thi có thời gian.</p></div>
-      <div class="card"><h3><span class="ic">📊</span>Phân tích kết quả</h3><p>Thống kê điểm, nhận diện điểm yếu, gợi ý lộ trình.</p></div>
-      <div class="card"><h3><span class="ic">🤖</span>Trợ lý AI</h3><p>Hỏi – đáp tức thì, trích nguồn rõ ràng.</p></div>
-      <div class="card"><h3><span class="ic">🛡️</span>Bảo mật & Minh bạch</h3><p>Đăng nhập an toàn, lưu vết bài làm.</p></div>
-      <div class="card"><h3><span class="ic">📱</span>Thân thiện đa thiết bị</h3><p>Trải nghiệm thống nhất trên di động & desktop.</p></div>
-    </div>
-  </section>
+  <!-- ĐÃ GỠ HOÀN TOÀN:
+       - <section class="strip"> ... KPI ...
+       - <section class="features"> ... lưới tính năng ...
+  -->
 
   <!-- FOOTER CHUYÊN NGHIỆP -->
   <footer class="pro-footer">
@@ -288,49 +274,7 @@
   <script src="js/ai.js" defer></script>
   <script src="js/app.js" defer></script>
 
-  <!-- KPI thực: analytics.js (window.PTKV3_STATS) + fallback localStorage -->
-  <script>
-    (function(){
-      function n(v){ try{ return Number(v)||0 }catch{return 0} }
-      function fmt(x){ try{ return Number(x).toLocaleString('vi-VN') }catch{return x} }
-      function pct(r){ return (Math.round((r||0)*1000)/10)+'%' }
-
-      const s = (window.PTKV3_STATS||{});
-      let sessions = n(s.sessions30d);
-      let attempts  = n(s.attempts30d);
-      let completed = n(s.completedAttempts30d);
-      let startMin  = n(s.avgStartMinutes);
-      let aiCount   = n(s.aiSessions30d);
-
-      try{
-        const THIRTY = 30*24*60*60*1000, now = Date.now();
-
-        if(!sessions){
-          const arr = JSON.parse(localStorage.getItem('ctct_learning_sessions')||'[]');
-          sessions = Array.isArray(arr) ? arr.filter(ts => now-n(ts) < THIRTY).length : 0;
-        }
-        if(!attempts || !completed){
-          const arr = JSON.parse(localStorage.getItem('ctct_results')||'[]');
-          const recent = Array.isArray(arr) ? arr.filter(r => now-n(r?.ts) < THIRTY) : [];
-          attempts  = attempts  || recent.length;
-          completed = completed || recent.filter(r => !!r?.finished).length;
-        }
-        if(!aiCount){
-          const arr = JSON.parse(localStorage.getItem('ctct_ai_sessions')||'[]');
-          aiCount = Array.isArray(arr) ? arr.filter(ts => now-n(ts) < THIRTY).length : 0;
-        }
-        if(!startMin){
-          startMin = n(localStorage.getItem('ctct_avg_start_minutes'));
-        }
-      }catch(e){}
-
-      document.getElementById('kpiSessions').textContent   = fmt(sessions);
-      document.getElementById('kpiCompletion').textContent = pct(attempts? completed/attempts : 0);
-      document.getElementById('kpiStartTime').textContent  = (startMin||0) + ' phút';
-      document.getElementById('kpiAi24').textContent       = fmt(aiCount);
-      document.getElementById('y').textContent = new Date().getFullYear();
-    })();
-  </script>
+  <!-- ĐÃ GỠ script KPI thực (tránh truy cập DOM không còn tồn tại) -->
 
   <!-- Ép UI Auth + User menu -->
   <script>
@@ -370,28 +314,21 @@
 
     function updateAuthUI(){
       const on = isAuthed();
-        // toggle class lên body để CSS quyết định hiển thị
-        document.body.classList.toggle('authed', on);
+      document.body.classList.toggle('authed', on);
 
-          // chip người dùng
-          userMenu.hidden = !on;
-          if (on) fillUserChip();
-
-          // ẩn hoàn toàn nút Logout cũ (chúng ta dùng dropdown)
-          btnLogout?.setAttribute('hidden','');
-          // nút Login chỉ hiện khi chưa đăng nhập
-          if (btnLogin) btnLogin.hidden = on;
-
-          // mobile
-          if (mLogin)  mLogin.hidden  = on;
-          if (mLogout) mLogout.hidden = !on;
-      // desktop
-      setHidden(btnLogin,  on);
-      setHidden(btnLogout, true);    // ẩn nút Logout cũ, dùng dropdown mới
-      setHidden(userMenu, !on);
+      userMenu.hidden = !on;
       if (on) fillUserChip();
 
-      // mobile
+      btnLogout?.setAttribute('hidden','');
+      if (btnLogin) btnLogin.hidden = on;
+
+      if (mLogin)  mLogin.hidden  = on;
+      if (mLogout) mLogout.hidden = !on;
+
+      setHidden(btnLogin,  on);
+      setHidden(btnLogout, true);
+      setHidden(userMenu, !on);
+      if (on) fillUserChip();
       setHidden(mLogin,  on);
       setHidden(mLogout, !on);
     }
@@ -401,11 +338,9 @@
       location.href = `login.html?redirect=${ret}`;
     }
 
-    // Click login buttons -> login.html
     btnLogin?.addEventListener('click', ()=>goLogin());
     mLogin?.addEventListener('click', ()=>goLogin());
 
-    // Links cần đăng nhập -> guard
     function guardLink(a){
       if(!a) return;
       a.addEventListener('click', (e)=>{
@@ -418,43 +353,36 @@
     ['a[href="kiemtra.html"]','a[href="practice.html"]','a[href="quiz.html"]','a[href="my-results.html"]','a[href="leaderboard.html"]']
       .forEach(sel => document.querySelectorAll(sel).forEach(guardLink));
 
-    // Đăng xuất
     function doLogout(){
       try{
         localStorage.removeItem('ctct_token');
         localStorage.removeItem('ctct_user');
         sessionStorage.removeItem('ctct_token');
-        localStorage.setItem('ctct_token',''); localStorage.removeItem('ctct_token'); // kích hoạt storage
+        localStorage.setItem('ctct_token',''); localStorage.removeItem('ctct_token');
       }catch{}
       updateAuthUI();
-      // Đóng dropdown nếu còn mở
       if (userDropdown) userDropdown.hidden = true;
     }
     btnLogout?.addEventListener('click', doLogout);
     mLogout?.addEventListener('click', doLogout);
     btnLogoutUser?.addEventListener('click', doLogout);
 
-    // Toggle dropdown khi bấm chip
     userChipBtn?.addEventListener('click', ()=>{
       if(!isAuthed()) return;
       const isOpen = !userDropdown.hidden;
-      userDropdown.hidden = isOpen; // toggle
+      userDropdown.hidden = isOpen;
     });
 
-    // Bấm ra ngoài để đóng dropdown
     document.addEventListener('click', (e)=>{
       if (!userMenu.contains(e.target)) {
         userDropdown.hidden = true;
       }
     });
 
-    // Token đổi ở tab khác -> cập nhật UI
     window.addEventListener('storage', (e)=>{ if(e.key==='ctct_token') updateAuthUI(); });
 
-    // Init
     updateAuthUI();
 
-    // Năm footer
     const y = document.getElementById('y');
     if (y) y.textContent = new Date().getFullYear();
   })();
