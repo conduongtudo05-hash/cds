@@ -203,60 +203,20 @@ header.nav .brand{ font-size: clamp(16px, 4.2vw, 20px); }
 /* Desktop: bỏ dính + hạ menu xuống một chút */
 @media (min-width:1025px){
   header.nav,
-  header.nav.nav-dark{
-    position: static !important;   /* không dính khi cuộn */
-    top: auto !important;
-    margin-top: 12px;              /* >>> đẩy cả thanh nav xuống khỏi mép trên */
-    padding: 12px 0;               /* dày dặn hơn */
-  }
-  header.nav .nav__inner{
-    align-items: center;
-    min-height: 16px;              /* chiều cao ổn cho desktop */
-  }
+  header.nav.nav-dark{ position: static !important; top: auto !important; margin-top: 12px; padding: 12px 0;}
+  header.nav .nav__inner{ align-items: center; min-height: 16px; }
 
   /* đề phòng file nav.css cộng padding-top cho body khi sticky */
-  body{ padding-top: 0 !important; }
-}
+  body{ padding-top: 0 !important; }}
 
-/* === Trợ lý AI gọn hơn trên MOBILE (rộng ~300px, cách phải 18px) === */
+/* === Trợ lý AI gọn nhẹ hơn trên MOBILE (giảm chiều cao) === */
 @media (max-width: 768px){
-  #ai-tray.ai-tray{
-    position: fixed;
-    bottom: 50px;           /* trên footer một chút */
-    right: 80px;            /* cách mép phải cho cân */
-    width: min(300px, 80vw);/* gọn hơn, tối đa 300px */
-    z-index: 9999;
-  }
+  #ai-tray.ai-tray{ position: fixed; right: 20px; bottom: max(84px, calc(56px + env(safe-area-inset-bottom))); width: min(270px, calc(100vw - 40px)); z-index: 9999; }
+  #ai-tray .ai-tray__panel{ width: 100%; max-width: 100%; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.3); overflow: hidden; }
+  #ai-tray .ai-tray__head{ padding: 8px 10px; font-size: 13px; }
+  /* Giới hạn chiều cao tổng thể để khay không chiếm nhiều màn hình */
+  #ai-tray .ai-tray__messages{ max-height: 38vh; padding: 6px 10px; overflow-y: auto; }
+  #ai-tray .ai-tray__form{ display: flex; align-items: center; gap: 6px; padding: 8px 10px; }
+  #ai-tray .ai-tray__form input{ flex: 1 1 auto; min-width: 0; height: 34px; font-size: 13px; padding: 6px 10px; }
+  #ai-tray .ai-tray__form button{ flex: 0 0 auto; height: 34px; padding: 0 10px; font-size: 13px;  white-space: nowrap; }}
 
-  #ai-tray .ai-tray__panel{
-    border-radius: 14px;
-    box-shadow: 0 10px 28px rgba(0,0,0,.3);
-    overflow: hidden;
-  }
-
-  #ai-tray .ai-tray__head{
-    padding: 8px 10px;
-    font-size: 13px;
-  }
-
-  #ai-tray .ai-tray__messages{
-    max-height: 62vh;       /* thấp hơn để không che toàn màn hình */
-    padding: 8px 10px;
-    overflow: auto;
-  }
-
-  #ai-tray .ai-tray__form{
-    gap: 6px;
-    padding: 8px 10px;
-  }
-  #ai-tray .ai-tray__form input{
-    height: 36px;
-    font-size: 13px;
-    padding: 6px 10px;
-  }
-  #ai-tray .ai-tray__form button{
-    height: 36px;
-    padding: 0 10px;
-    font-size: 13px;
-  }
-}
