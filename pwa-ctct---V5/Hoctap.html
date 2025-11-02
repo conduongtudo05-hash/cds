@@ -418,6 +418,21 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
     text-wrap:balance;
   }
 }
+/* Luôn 1 dòng cho tiêu đề trang */
+.page-title{
+  /* co giãn thông minh theo chiều rộng màn hình */
+  font-size: clamp(20px, 5.2vw, 32px);
+  line-height: 1.1;
+  white-space: nowrap;        /* không cho xuống dòng */
+  overflow: hidden;           /* nếu quá dài thì… */
+  text-overflow: ellipsis;    /* …hiển thị “…” thay vì vỡ bố cục */
+  margin: 22px 0 10px;        /* giữ nguyên spacing */
+}
+
+/* Nếu muốn không bị “…” ở máy cực nhỏ, có thể nén chữ thêm chút */
+@media (max-width: 360px){
+  .page-title{ letter-spacing: 0; }
+}
 
 </style>
 
@@ -964,3 +979,4 @@ const saved = localStorage.getItem(STORAGE.CURRENT);
 </script>
 </body>
 </html>
+
