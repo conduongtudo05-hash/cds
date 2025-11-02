@@ -422,11 +422,11 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
 .page-title{
   font-size: clamp(22px, 4.6vw, 32px);
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.5;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 22px 0 10px;
+  margin: 10px 0 10px;
   text-rendering: optimizeLegibility; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -434,7 +434,10 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
 
 /* Nếu muốn không bị “…” ở máy cực nhỏ, có thể nén chữ thêm chút */
 @media (max-width: 360px){
-  .page-title{ letter-spacing: 0; }
+  .page-title{
+    font-size: clamp(18px, 5vw, 26px);
+    letter-spacing: .2px;
+  }
 }
 
 </style>
@@ -982,5 +985,6 @@ const saved = localStorage.getItem(STORAGE.CURRENT);
 </script>
 </body>
 </html>
+
 
 
