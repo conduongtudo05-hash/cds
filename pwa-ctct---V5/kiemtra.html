@@ -127,6 +127,50 @@ body.bg-red{
 
 /* Footer */
 .footer{color:#FFE6A6;text-align:center;padding:14px 16px 18px;border-top:1px solid rgba(255,255,255,.12)}
+/* === FIX MOBILE: thu gọn khoảng trống giữa HERO và GRID === */
+@media (max-width: 768px){
+  /* Chặn mọi min-height/padding vô tình từ stylesheet khác */
+  .hero{
+    min-height: unset !important;
+    padding-top: 12px !important;
+    padding-bottom: 4px !important;  /* bớt đáy */
+    margin-bottom: 0 !important;
+  }
+  .hero h1{ margin: 4px 0 6px !important; font-size: 26px; line-height: 1.15; }
+  .hero p { margin: 0 !important; }
+
+  /* Ép phần lưới dính sát hero hơn */
+  .hero + .grid{
+    margin-top: 8px !important;      /* trước là 22px -> 8px */
+    padding-top: 0 !important;
+  }
+
+  /* Tránh “đội khoảng” do collapse margin trong grid */
+  .grid{ display:block; }
+
+  /* Card gọn chiều cao để hiện sớm hơn trong viewport */
+  .card{
+    height: auto;                     /* bỏ fixed 260px trên mobile */
+    padding: 14px 14px 12px;
+  }
+  .card .actions{ margin-top: 12px; }
+  .btn{ min-width: 160px; padding: 8px 12px; font-size: 14px; }
+}
+/* === MOBILE: thêm khoảng cách giữa các ô kỳ thi === */
+@media (max-width: 768px){
+  .grid{
+    display: grid !important;      /* trả lại grid để dùng gap */
+    grid-template-columns: 1fr;    /* 1 cột */
+    row-gap: 16px;                 /* khoảng cách dọc giữa các card */
+    column-gap: 0;
+    margin-top: 10px !important;
+  }
+  .card{
+    height: auto;
+    padding: 14px 14px 12px;
+    margin: 0;                     /* bỏ mọi margin chen ngang */
+  }
+}
 </style>
 </head>
 <body>
@@ -355,3 +399,4 @@ function escapeHTML(s){return String(s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;'
 </script>
 </body>
 </html>
+
