@@ -192,14 +192,26 @@
       const u=document.getElementById('li-username').value.trim();
       const p=document.getElementById('li-password').value;
       const r=await apiPost('login',{username:u,password:p});
-      if(r&&r.ok){
-        localStorage.setItem('ctct_token',r.token);
-        localStorage.setItem('ctct_user',JSON.stringify(r.user||{}));
-        localStorage.setItem('ptkv3_token',r.token);
-        localStorage.setItem('ptkv3_user',JSON.stringify(r.user||{}));
-        const back=new URLSearchParams(location.search).get('redirect')||'index.html';
-        location.replace(back);
-      }else{
+     if(r && r.ok){
+    localStorage.setItem('ctct_token', r.token);
+    localStorage.setItem('ctct_user', JSON.stringify(r.user || {}));
+    localStorage.setItem('ptkv3_token', r.token);
+    localStorage.setItem('ptkv3_user', JSON.stringify(r.user || {}));
+
+  // ==== NEW: lưu session cho trang làm bài ====
+      try{
+        const u = r.user || {};
+        sessionStorage.setItem('ptkv3:auth', JSON.stringify({
+          userId:   u.userId || u.id || '',
+          username: u.username || u.account || u.email || '',
+          fullName: u.fullName || u.name || '',
+          unit:     u.unit || ''
+        }));
+      }catch(e){ console.warn('set session auth fail', e); }
+
+      const back = new URLSearchParams(location.search).get('redirect') || 'index.html';
+      location.replace(back);
+    }else{
         const el=document.getElementById('login-error');el.textContent=(r&&r.error)?r.error:'Không thể đăng nhập.';el.style.display='block';
       }
     });

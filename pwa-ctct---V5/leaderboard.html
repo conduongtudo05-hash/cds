@@ -1,246 +1,153 @@
 <!doctype html>
 <html lang="vi">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Bảng xếp hạng – CTĐ, CTCT</title>
-
-  <!-- đúng path khi file nằm trong /pages -->
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="css/nav.css">
-  <!-- chặn chưa đăng nhập + giới hạn quyền xem -->
-   <!-- Global styles -->
-  <link rel="stylesheet" href="css/style.css">
-
-  <script src="js/auth-guard.js" data-require-role="unit_viewer,admin" defer></script>
-
-  <style>
-    :root{
-      --brand:#A41919; --brand-600:#8B1616;
-      --bg:#f5f6f8; --card:#fff; --text:#111827; --muted:#6b7280; --border:#e5e7eb;
-      --gold:#f59e0b; --silver:#94a3b8; --bronze:#b45309; --row:#fff7ed;
-    }
-    *{box-sizing:border-box}
-    html,body{margin:0;background:var(--bg);color:var(--text)}
-    .topbar{display:flex;gap:12px;align-items:center;background:var(--brand);color:#fff;padding:14px 16px}
-    .topbar a{color:#fff;text-decoration:none}
-    .topbar h2{margin:0;font-size:18px;font-weight:800}
-    .container{max-width:1120px;margin:16px auto;padding:0 12px}
-    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,.06);padding:16px}
-
-    .row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-    .tabs{display:flex;gap:8px}
-    .tab{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:#fff;font-weight:800;cursor:pointer}
-    .tab.active{background:var(--brand);color:#fff;box-shadow:0 6px 12px rgba(164,25,25,.2)}
-    .select,.btn{padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:#fff;font-size:14px}
-    .btn{background:var(--brand);color:#fff;border:none;font-weight:800;cursor:pointer}
-    .btn:hover{background:var(--brand-600)}
-    .muted{color:var(--muted)}
-
-    .podium{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
-    .pod{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center}
-    .pod .place{font-size:22px;font-weight:900}
-    .pod .unit{font-weight:800}
-    .pod .score{font-size:14px;color:var(--muted)}
-    .g{color:var(--gold)} .s{color:var(--silver)} .b{color:var(--bronze)}
-    @media (max-width:680px){ .podium{grid-template-columns:1fr} }
-
-    table{width:100%;border-collapse:separate;border-spacing:0}
-    thead th{text-align:left;padding:12px;border-bottom:1px solid var(--border);font-weight:800}
-    tbody td{padding:12px;border-bottom:1px solid var(--border);vertical-align:middle}
-    tbody tr.highlight{background:var(--row)}
-    .rank-badge{display:inline-flex;align-items:center;gap:6px;font-weight:900;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:#fff}
-    .rank-1{border-color:var(--gold); color:var(--gold)}
-    .rank-2{border-color:var(--silver); color:var(--silver)}
-    .rank-3{border-color:var(--bronze); color:var(--bronze)}
-    .prog{height:10px;background:#f3f4f6;border-radius:999px;overflow:hidden}
-    .prog>span{display:block;height:100%;background:var(--brand)}
-    .empty{padding:16px;text-align:center;color:var(--muted)}
-  </style>
-
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => navigator.serviceWorker.register('../sw.js'));
-    }
-  </script>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>PTKV3 • Bảng xếp hạng</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{ --ink:#0f172a; --muted:#64748b; --brand:#A41919; --gold:#FFD966; }
+body{ margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif; background:#fff8ea; color:var(--ink); }
+.wrap{ max-width:1100px; margin:28px auto; padding:0 16px; }
+h1{ margin:0 0 14px; font-size:28px; font-weight:800 }
+.sub{ color:var(--muted); margin:0 0 16px }
+.tabs{ display:flex; gap:8px; margin:10px 0 18px }
+.tab{ border:2px solid #e2e8f0; background:#fff; padding:8px 12px; border-radius:10px; cursor:pointer; font-weight:700 }
+.tab.active{ border-color:#c2410c; background:#ffedd5 }
+.ctrls{ display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 14px }
+input,select,button{ padding:8px 10px; border-radius:8px; border:1px solid #e2e8f0; font-family:inherit }
+button.primary{ background:linear-gradient(180deg,#E35A2A,#A41919); color:#fff; border:none; font-weight:800 }
+.table{ width:100%; border-collapse:separate; border-spacing:0 8px; }
+.table th{ text-align:left; font-size:13px; color:#475569; padding:0 10px }
+.row{ background:#fff; box-shadow:0 6px 16px rgba(0,0,0,.06); border:1px solid #f1d8a5; border-radius:12px; }
+.row td{ padding:12px 10px; }
+.rank{ width:64px; font-weight:900; text-align:center }
+.badge{ display:inline-block; padding:4px 8px; border-radius:999px; background:#fffbeb; border:1px solid #fde68a; font-weight:800 }
+</style>
 </head>
 <body>
-  <div class="topbar">
-    <a href="index.html">← Trang chủ</a>
-    <h2>BẢNG XẾP HẠNG</h2>
+<div class="wrap">
+  <h1>Bảng xếp hạng</h1>
+  <p class="sub" id="subtitle">—</p>
+
+  <div class="tabs">
+    <button class="tab active" data-scope="user">Cá nhân</button>
+    <button class="tab" data-scope="unit">Đơn vị</button>
   </div>
 
-  <main class="container">
-    <section class="card">
-      <div class="row">
-        <div class="tabs" role="tablist" aria-label="Chọn nhóm xếp hạng">
-          <button id="tab-unit"   class="tab active" data-group="unit"   role="tab" aria-selected="true">Theo đơn vị</button>
-          <button id="tab-person" class="tab"        data-group="person" role="tab" aria-selected="false">Theo cá nhân</button>
-        </div>
-        <label>
-          <span class="sr-only">Khoảng thời gian</span>
-          <select id="period" class="select" title="Khoảng thời gian">
-            <option value="">Tất cả thời gian</option>
-            <option value="7d">7 ngày gần đây</option>
-            <option value="this_week">Tuần này</option>
-            <option value="last_week">Tuần trước</option>
-            <option value="this_month">Tháng này</option>
-            <option value="last_month">Tháng trước</option>
-          </select>
-        </label>
-        <button id="apply" class="btn" type="button">Áp dụng</button>
-      </div>
+  <div class="ctrls">
+    <input id="bank" placeholder="Nhập bankId (vd: CTDT-2025)" />
+    <select id="bestOf">
+      <option value="best" selected>Điểm cao nhất</option>
+      <option value="latest">Lần nộp gần nhất</option>
+    </select>
+    <input id="limit" type="number" min="1" max="500" value="50" style="width:100px" />
+    <button class="primary" id="btnLoad">Tải BXH</button>
+  </div>
 
-      <div id="podium" class="podium" hidden></div>
+  <table class="table" id="tbl">
+    <thead id="thead"></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
 
-      <div class="table-wrap">
-        <table>
-          <thead id="thead"></thead>
-          <tbody id="tbody">
-            <tr><td colspan="6" class="empty">Đang tải xếp hạng…</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-  </main>
+<!-- Guard: chỉ-cần-đăng-nhập, không yêu cầu role -->
+<script src="js/auth-guard.js" data-require-login="true" defer></script>
+<!-- Config toàn cục: nên khai báo window.PTKV3_API trong js/config.js -->
+<script src="js/config.js"></script>
 
-  <!-- cấu hình chung -->
-  <script src="js/config.js"></script>
+<script>
+// ======== Cấu hình API + Phiên đăng nhập dùng chung ========
+const API_BASE =
+  (window.PTKV3_API) ||            // Chuẩn PTKV3 (khuyến nghị)
+  (window.SHEET_API)  ||           // Dự án cũ (fallback)
+  'https://script.google.com/macros/s/AKfycbxLc27Q0wjn8fReUd0VGVva63-tihSoEbYAyP2g__uPYTww8QA-fheaKQ0iK43iEao_/exec'; // Cuối cùng
 
-  <script>
-    const CFG = window.CTCT_CONFIG || {};
-    const SHEET_API = CFG.SHEET_API || "";
+function getSession(){
+  try{ return JSON.parse(localStorage.getItem('PTKV3_SESSION')||'null') }catch(_){ return null }
+}
+function authHeaders(){
+  const ses=getSession();
+  return ses?.token ? { 'Authorization':'Bearer '+ses.token } : {};
+}
+const $ = (s,r=document)=>r.querySelector(s);
 
-    let currentGroup = 'unit';
-    const sortRank = (a,b)=> (Number(b.avg)-Number(a.avg)) || (Number(b.max)-Number(a.max)) || (Number(b.count)-Number(a.count));
-    const rankBadge = (i)=>{
-      const n=i+1;
-      if (n===1) return `<span class="rank-badge rank-1">🥇 TOP 1</span>`;
-      if (n===2) return `<span class="rank-badge rank-2">🥈 TOP 2</span>`;
-      if (n===3) return `<span class="rank-badge rank-3">🥉 TOP 3</span>`;
-      return `<span class="rank-badge">#${n}</span>`;
-    };
+// ======== UI hành vi ========
+const scopeTabs = document.querySelectorAll('.tab');
+let scope='user';
 
-    function renderHead(){
-      const th = document.getElementById('thead');
-      if (currentGroup==='person'){
-        th.innerHTML = `
-          <tr>
-            <th style="width:120px">Xếp hạng</th>
-            <th>Họ và tên</th>
-            <th style="width:180px">Đơn vị</th>
-            <th style="width:110px">SL làm</th>
-            <th style="width:320px">Điểm TB (thang 10)</th>
-            <th style="width:130px">Điểm cao nhất</th>
-          </tr>`;
-      }else{
-        th.innerHTML = `
-          <tr>
-            <th style="width:120px">Xếp hạng</th>
-            <th>Đơn vị</th>
-            <th style="width:110px">SL làm</th>
-            <th style="width:320px">Điểm TB (thang 10)</th>
-            <th style="width:130px">Điểm cao nhất</th>
-          </tr>`;
-      }
-    }
+scopeTabs.forEach(t=> t.addEventListener('click', ()=>{
+  scopeTabs.forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  scope = t.dataset.scope || 'user';
+  loadLB();
+}));
 
-    function renderPodium(rows){
-      const pod=document.getElementById('podium');
-      if (!rows.length){ pod.hidden=true; return; }
-      const top=rows.slice(0,3);
-      pod.innerHTML = top.map((r,i)=>{
-        const cls=i===0?'g':i===1?'s':'b', medal=i===0?'🥇':i===1?'🥈':'🥉';
-        const title = currentGroup==='person' ? `${r.name} — ${r.unit}` : r.unit;
-        return `<div class="pod">
-          <div class="place ${cls}">${medal} TOP ${i+1}</div>
-          <div class="unit">${title}</div>
-          <div class="score">Điểm TB: <b>${r.avg}</b> • Cao nhất: <b>${r.max}</b> • SL: ${r.count}</div>
-        </div>`;
-      }).join('');
-      pod.hidden=false;
-    }
+$('#btnLoad').addEventListener('click', loadLB);
 
-    function renderTable(rows){
-      const tb=document.getElementById('tbody');
-      if (!rows.length){
-        tb.innerHTML=`<tr><td colspan="${currentGroup==='person'?6:5}" class="empty">Không có dữ liệu.</td></tr>`;
-        return;
-      }
-      tb.innerHTML = rows.map((r,i)=>{
-        const pct=Math.max(0,Math.min(100,(Number(r.avg)/10)*100));
-        const hi=i<3?'class="highlight"':'';
-        if (currentGroup==='person'){
-          return `<tr ${hi}>
-            <td>${rankBadge(i)}</td>
-            <td><b>${r.name}</b></td>
-            <td>${r.unit}</td>
-            <td>${r.count}</td>
-            <td>
-              <div style="display:flex;align-items:center;gap:10px">
-                <div class="prog" style="flex:1"><span style="width:${pct}%"></span></div>
-                <div><b>${Number(r.avg).toFixed(2)}</b></div>
-              </div>
-            </td>
-            <td>${r.max}</td>
-          </tr>`;
-        }
-        return `<tr ${hi}>
-          <td>${rankBadge(i)}</td>
-          <td><b>${r.unit}</b></td>
-          <td>${r.count}</td>
-          <td>
-            <div style="display:flex;align-items:center;gap:10px">
-              <div class="prog" style="flex:1"><span style="width:${pct}%"></span></div>
-              <div><b>${Number(r.avg).toFixed(2)}</b></div>
-            </div>
-          </td>
-          <td>${r.max}</td>
-        </tr>`;
-      }).join('');
-    }
+// ======== Render helpers ========
+function fmtTime(sec){ sec=Number(sec||0); const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(sec%60).padStart(2,'0'); return `${m}:${s}`; }
+function escapeHTML(s){ return String(s||'').replace(/[&<>"']/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;" }[c])); }
 
-    async function fetchBoard(){
-      const tb=document.getElementById('tbody');
+// ======== Tải BXH ========
+async function loadLB(){
+  const bank = $('#bank').value.trim();
+  const bestOf = $('#bestOf').value;
+  const limit = Math.max(1, Math.min(500, Number($('#limit').value||50)));
 
-      if (!SHEET_API){
-        tb.innerHTML = `<tr><td colspan="6" class="empty">Thiếu SHEET_API trong config.js</td></tr>`;
-        return;
-      }
+  const url = new URL(API_BASE);
+  url.searchParams.set('action','leaderboard');
+  url.searchParams.set('scope', scope);
+  if(bank) url.searchParams.set('bank', bank);
+  url.searchParams.set('bestOf', bestOf);
+  url.searchParams.set('limit', String(limit));
 
-      const period = document.getElementById('period').value || '';
-      const q = new URLSearchParams({ action:'leaderboard', group:currentGroup, period });
-      const url = `${SHEET_API}?${q.toString()}`;
+  $('#subtitle').textContent = 'Đang tải…';
+  $('#thead').innerHTML = ''; $('#tbody').innerHTML = '';
 
-      try{
-        const res = await fetch(url,{cache:'no-store'});
-        const data = await res.json();
-        let rows = Array.isArray(data.rows) ? data.rows : [];
-        rows = rows.sort(sortRank);
-        renderHead();
-        renderPodium(rows);
-        renderTable(rows);
-      }catch(_){
-        tb.innerHTML = `<tr><td colspan="6" class="empty">Không tải được dữ liệu.</td></tr>`;
-      }
-    }
+  try{
+    const res = await fetch(url.toString(), { headers: authHeaders(), cache:'no-store' });
+    const j = await res.json();
 
-    function setTab(group){
-      currentGroup = group;
-      document.querySelectorAll('.tab').forEach(t=>{
-        const active = t.dataset.group === group;
-        t.classList.toggle('active', active);
-        t.setAttribute('aria-selected', active?'true':'false');
+    const title = j.bankTitle ? `${j.bankTitle} (${j.bank || '—'})` : (j.bank || 'Tất cả kỳ thi');
+    $('#subtitle').textContent = `Phạm vi: ${scope==='user'?'Cá nhân':'Đơn vị'} • Kỳ thi: ${title} • Xếp theo: ${j.bestOf==='latest'?'Lần nộp gần nhất':'Điểm cao nhất'}`;
+
+    if(scope==='user'){
+      $('#thead').innerHTML = `<tr><th>#</th><th>Họ tên</th><th>Đơn vị</th><th>%</th><th>Điểm</th><th>Thời gian</th><th>Lần nộp</th></tr>`;
+      (j.items||[]).forEach(it=>{
+        const tr = document.createElement('tr'); tr.className = 'row';
+        tr.innerHTML = `
+          <td class="rank">${it.rank}</td>
+          <td><strong>${escapeHTML(it.userName||'(Không tên)')}</strong></td>
+          <td>${escapeHTML(it.userUnit||'—')}</td>
+          <td><span class="badge">${it.pct}%</span></td>
+          <td>${it.correct}/${it.total}</td>
+          <td>${fmtTime(it.spentSec)}</td>
+          <td>${it.attempts}</td>
+        `;
+        $('#tbody').appendChild(tr);
       });
-      fetchBoard();
+    }else{
+      $('#thead').innerHTML = `<tr><th>#</th><th>Đơn vị</th><th>Điểm TB</th><th>Số thành viên</th><th>Tiêu biểu</th></tr>`;
+      (j.items||[]).forEach(it=>{
+        const tr = document.createElement('tr'); tr.className = 'row';
+        tr.innerHTML = `
+          <td class="rank">${it.rank}</td>
+          <td><strong>${escapeHTML(it.unit)}</strong></td>
+          <td><span class="badge">${it.avgPct}%</span></td>
+          <td>${it.members}</td>
+          <td>${escapeHTML(it.topUser||'—')}</td>
+        `;
+        $('#tbody').appendChild(tr);
+      });
     }
+  }catch(err){
+    $('#subtitle').textContent = 'Lỗi tải dữ liệu.'; console.error(err);
+  }
+}
 
-    document.getElementById('tab-unit').addEventListener('click', ()=>setTab('unit'));
-    document.getElementById('tab-person').addEventListener('click', ()=>setTab('person'));
-    document.getElementById('apply').addEventListener('click', fetchBoard);
-
-    renderHead();
-    fetchBoard();
-  </script>
+// Tải lần đầu
+document.addEventListener('DOMContentLoaded', loadLB);
+</script>
 </body>
 </html>

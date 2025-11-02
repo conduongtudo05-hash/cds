@@ -239,160 +239,196 @@ main{flex:1 0 auto}
 
 <!-- ================== LOGIC ĐỒNG BỘ KIẾN TRÚC ================== -->
 <script>
-/** CONFIG */
-const API_BASE = 'https://script.google.com/macros/s/DEPLOYMENT_ID/exec'; // TODO: đổi DEPLOYMENT_ID
-const RESULT_PAGE = 'ketqua.html';  // Trang kết quả đích theo yêu cầu
+/* ===== CONFIG ===== */
+const API_BASE = 'https://script.google.com/macros/s/AKfycbxLc27Q0wjn8fReUd0VGVva63-tihSoEbYAyP2g__uPYTww8QA-fheaKQ0iK43iEao_/exec';
+const RESULT_PAGE = 'ketqua.html';
 
-/** Lấy meta hiện tại từ session (do keimtra.html set) hoặc query */
-const CURRENT = (()=>{
-  try{
-    const s = sessionStorage.getItem('ptkv3:exam:current');
-    return s ? JSON.parse(s) : {};
-  }catch(e){ return {}; }
-})();
+/* ===== SESSION / PARAMS ===== */
+const CURRENT = (()=>{try{const s=sessionStorage.getItem('ptkv3:exam:current');return s?JSON.parse(s):{};}catch(e){return {};}})();
 const qs = new URLSearchParams(location.search);
 const BANK = CURRENT.bankId || qs.get('bank') || '';
 const MODE = (CURRENT.mode || qs.get('mode') || 'exam');
 
-/** DOM refs */
+/* ===== DOM ===== */
 const $ = (s, r=document)=>r.querySelector(s);
-const qNum = $('#qNum'), qText = $('#qText'), opts = $('#opts'), gridNums = $('#gridNums');
-const btnPrev = $('#btnPrev'), btnNext = $('#btnNext'), btnSubmit = $('#btnSubmit'), timerText = $('#timerText');
-const titleEl = $('#examTitle');
+const qNum=$('#qNum'),qText=$('#qText'),opts=$('#opts'),gridNums=$('#gridNums');
+const btnPrev=$('#btnPrev'),btnNext=$('#btnNext'),btnSubmit=$('#btnSubmit'),timerText=$('#timerText'),titleEl=$('#examTitle');
 
 /** State */
-let QUESTIONS = [];                 // [{id,text,opts[],correct,topic}]
-let TOTAL = 0;
-let idx = 0;
-let answers = new Map();            // key: question.id, val: option index
-let durationSec = 30*60;            // fallback
-let remaining = durationSec;
-let timer = null;
+let QUESTIONS=[];     // [{id,text,opts[],correct,topic, no?}]
+let TOTAL=0;
+let idx=0;
+let answers=new Map(); // key: q.id -> {no,qid,qtext,chosen,chosenText,correctIndex,correctText,ok}
+let durationSec=30*60;
+let remaining=durationSec;
+let timer=null;
 
 /** Helpers */
-const letters = ['A','B','C','D'];
-function pad2(n){ return String(n).padStart(2,'0'); }
-function fmtTime(sec){ const m=Math.floor(sec/60); const s=sec%60; return `${pad2(m)}:${pad2(s)}`; }
+const letters=['A','B','C','D'];
+const pad2=n=>String(n).padStart(2,'0');
+const fmtTime=sec=>`${pad2(Math.floor(sec/60))}:${pad2(sec%60)}`;
 
-/** Render */
+/** Render câu */
 function renderQuestion(){
   const q = QUESTIONS[idx];
-  qNum.textContent = `Câu ${q.id}`;
+  qNum.textContent = `Câu ${q.no ?? (idx+1)}`;
   qText.textContent = q.text || '';
-  opts.innerHTML = '';
-  (q.opts || q.options || []).forEach((t,i)=>{
-    const row = document.createElement('label');
-    row.className = 'opt';
-    const checked = answers.get(q.id) === i;
+
+  const saved = answers.get(q.id);
+  opts.innerHTML='';
+  (q.opts||q.options||[]).forEach((t,i)=>{
+    const row = document.createElement('label'); row.className='opt';
+    const checked = saved ? saved.chosen===i : false;
     if(checked) row.classList.add('is-selected');
     row.innerHTML = `
       <span class="opt__letter">${letters[i]||String(i+1)}</span>
-      <span class="opt__text">${t ?? ''}</span>
+      <span class="opt__text">${t??''}</span>
       <input type="radio" name="q${q.id}" ${checked?'checked':''}/>
     `;
-    row.querySelector('input').addEventListener('change',()=>{
-      answers.set(q.id, i);
-      // highlight chọn
+    row.querySelector('input').addEventListener('change', ()=>{
+      // LƯU ĐỐI TƯỢNG ĐẦY ĐỦ (có text) – bảo đảm Results_DET có dữ liệu thật
+      answers.set(q.id, {
+        no: (q.no ?? (idx+1)),
+        qid: q.id,
+        qtext: q.text || '',
+        chosen: i,
+        chosenText: (q.opts && q.opts[i]) ? q.opts[i] : '',
+        correctIndex: Number(q.correct),
+        correctText: (q.opts && q.opts[Number(q.correct)]) ? q.opts[Number(q.correct)] : '',
+        ok: i === Number(q.correct)
+      });
       row.classList.add('is-selected');
       opts.querySelectorAll('.opt').forEach(el=>{ if(el!==row) el.classList.remove('is-selected'); });
       syncGrid();
     });
     opts.appendChild(row);
   });
+
   btnPrev.disabled = idx===0;
   btnNext.disabled = idx===TOTAL-1;
   syncGrid();
 }
-
+/** Lưới số */
 function renderGrid(){
-  gridNums.innerHTML = '';
+  gridNums.innerHTML='';
   for(let i=0;i<TOTAL;i++){
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.className = 'num';
-    b.textContent = (QUESTIONS[i]?.id ?? (i+1));
+    const b=document.createElement('button');
+    b.type='button'; b.className='num';
+    b.textContent = String(QUESTIONS[i]?.no || (i+1));
     b.addEventListener('click',()=>{ idx=i; renderQuestion(); });
     gridNums.appendChild(b);
   }
   syncGrid();
 }
-
 function syncGrid(){
   [...gridNums.children].forEach((el,i)=>{
     const qid = QUESTIONS[i]?.id;
     el.classList.toggle('current', i===idx);
-    el.classList.toggle('answered', answers.has(qid));
+    el.classList.toggle('answered', !!answers.get(qid));
   });
 }
 
 /** Timer */
 function startTimer(){
   clearInterval(timer);
-  remaining = durationSec;
-  updateTimer();
-  timer = setInterval(()=>{
-    remaining = Math.max(0, remaining-1);
-    updateTimer();
+  remaining=durationSec; timerText.textContent=fmtTime(remaining);
+  timer=setInterval(()=>{
+    remaining=Math.max(0,remaining-1);
+    timerText.textContent=fmtTime(remaining);
     if(remaining===0){ clearInterval(timer); safeSubmit(true); }
-  }, 1000);
+  },1000);
 }
-function updateTimer(){ timerText.textContent = fmtTime(remaining); }
 
-/** Nộp bài */
-function calcScore(){
-  let correct=0, total=TOTAL;
-  for(const q of QUESTIONS){
-    const a = answers.get(q.id);
-    if(a !== undefined && a === Number(q.correct)) correct++;
-  }
-  return { correct, total };
-}
-function safeSubmit(auto=false){
-  const {correct,total} = calcScore();
-  const spent = Math.max(0, durationSec - remaining);
-  const params = new URLSearchParams({
-    correct: String(correct),
-    total: String(total),
-    time: fmtTime(spent),
-    bank: BANK || '',
-    mode: MODE || 'exam',
-    auto: auto ? '1' : '0'
+/** Submit an toàn (ghi GAS + chuyển trang) */
+async function safeSubmit(auto=false){
+  // dựng chi tiết có TEXT đầy đủ
+  const detail = QUESTIONS.map((q,i)=>{
+    const a = answers.get(q.id) || {};
+    const chosen = (typeof a.chosen==='number') ? a.chosen : -1;
+    return {
+      no: (q.no ?? (i+1)),
+      qid: Number(q.id),
+      qtext: q.text || '',
+      chosen,
+      chosenText: chosen>=0 ? (q.opts?.[chosen]||'') : '',
+      correctIndex: Number(q.correct),
+      correctText: q.opts?.[Number(q.correct)] || '',
+      ok: chosen === Number(q.correct)
+    };
   });
-  location.href = `${RESULT_PAGE}?${params.toString()}`;
-}
 
-/** Load questions from API */
-async function loadQuestions(){
-  if(!BANK){
-    alert('Không xác định được mã kỳ thi (bankId). Vui lòng quay lại trang Kiểm tra.');
-    return;
+  const correct  = detail.filter(x=>x.ok===true).length;
+  const answered = detail.filter(x=>x.chosen>=0).length;
+  const skip     = detail.length - answered;
+  const wrong    = detail.length - correct - skip;
+  const spent    = Math.max(0, durationSec - remaining);
+
+  // payload gửi dạng form-url-encoded để tránh preflight
+  const form = new URLSearchParams();
+  form.set('action',   'submit');
+  form.set('bankId',   BANK);
+  form.set('total',    String(detail.length));
+  form.set('correct',  String(correct));
+  form.set('wrong',    String(wrong));
+  form.set('skip',     String(skip));
+  form.set('spentSec', String(spent));
+  form.set('userAgent', navigator.userAgent);
+  form.set('device', /Mobi|Android/i.test(navigator.userAgent)?'mobile':'desktop');
+
+  // nếu đã login qua AUTH và có info trong localStorage
+  try{
+    const u = JSON.parse(localStorage.getItem('ptkv3_user')||'{}');
+    if(u.id)       form.set('userId',   u.id);
+    if(u.username) form.set('username', u.username);
+    if(u.name)     form.set('userName', u.name);
+    if(u.unit)     form.set('userUnit', u.unit);
+  }catch(_){}
+
+  form.set('answers', JSON.stringify(detail));
+  form.set('extra',   JSON.stringify({ mode: MODE, title: (CURRENT.title||'') }));
+
+  try{
+    const res  = await fetch(API_BASE, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8' },
+      body: form.toString(),
+      cache:'no-store'
+    });
+
+    // Trường hợp web-app trả HTML (do quyền), parse JSON an toàn
+    let dataText = await res.text();
+    let data; try { data = JSON.parse(dataText) } catch { data = { ok:false, error:'Response is not JSON' } }
+
+    if(!data.ok){
+      alert('Không thể ghi kết quả về hệ thống. ' + (data.error || ''));
+    }
+  }catch(err){
+    alert('Không thể ghi kết quả về hệ thống. Vui lòng thử lại.');
   }
-  // tiêu đề từ session nếu có
-  if(CURRENT.title){ titleEl.textContent = CURRENT.title.toUpperCase(); }
+
+  // chuyển trang kết quả để không kẹt UX
+  const q = new URLSearchParams({ correct:String(correct), total:String(detail.length), time:fmtTime(spent), bank:BANK, mode:MODE });
+  location.href = `${RESULT_PAGE}?${q.toString()}`;
+}
+/* ===== LOAD QUESTIONS ===== */
+async function loadQuestions(){
+  if(!BANK){ alert('Không xác định được mã kỳ thi (bankId).'); location.href='kiemtra.html'; return; }
 
   const url = `${API_BASE}?action=questions&bank=${encodeURIComponent(BANK)}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  if(!data.ok || !Array.isArray(data.questions) || !data.questions.length){
-    console.error('questions failed:', data);
-    alert('Không tải được ngân hàng câu hỏi. Vui lòng thử lại hoặc liên hệ quản trị.');
-    return;
+  try{
+    const res  = await fetch(url, {cache:'no-store'});
+    const data = await res.json();
+    if(!data.ok){ alert(`Không thể tải ngân hàng câu hỏi.\nChi tiết: ${data.error||'unknown'}`); return; }
+
+    QUESTIONS   = data.questions.map((q,i)=>({ ...q, no:(i+1) }));
+    TOTAL       = Number(data.total || QUESTIONS.length || 0);
+    durationSec = Number(data.durationSec || 30*60);
+
+    idx=0; answers=new Map();
+    renderGrid(); renderQuestion(); startTimer();
+  }catch(err){
+    alert(`Không thể tải ngân hàng câu hỏi.\nChi tiết: ${err?.message||err}`);
   }
-
-  QUESTIONS = data.questions.map(q=>({
-    id: Number(q.id),
-    text: String(q.text || ''),
-    opts: (q.opts || q.options || []).map(String),
-    correct: Number(q.correct),
-    topic: String(q.topic || '')
-  }));
-  TOTAL = Number(data.total || QUESTIONS.length || 0);
-  durationSec = Number(data.durationSec || CURRENT.durationSec || 30*60);
-
-  // Khởi tạo render
-  idx = 0; answers = new Map();
-  renderGrid(); renderQuestion();
-  remaining = durationSec; startTimer();
 }
 
 /** Events */
@@ -401,24 +437,20 @@ btnNext.addEventListener('click',()=>{ if(idx<TOTAL-1){ idx++; renderQuestion();
 btnSubmit.addEventListener('click',()=>{ if(confirm('Xác nhận nộp bài?')) safeSubmit(false); });
 
 /** Init */
-loadQuestions().catch(err=>{
-  console.error(err);
-  alert('Có lỗi khi tải đề thi.');
-});
+loadQuestions();
 </script>
 
-<!-- Giữ nguyên script mở/đóng submenu của anh -->
 <script>
 // Mở/đóng submenu khi bấm vào "Kết quả"
 document.querySelectorAll('.has-sub .sub-trigger').forEach(btn=>{
-  btn.addEventListener('click', (e)=>{
+  btn.addEventListener('click',(e)=>{
     e.preventDefault();
-    const wrap = btn.closest('.has-sub');
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    const wrap=btn.closest('.has-sub');
+    const expanded=btn.getAttribute('aria-expanded')==='true';
     document.querySelectorAll('.has-sub').forEach(w=>{
       w.classList.remove('open');
       const b=w.querySelector('.sub-trigger');
-      if(b) b.setAttribute('aria-expanded','false');
+      if(b)b.setAttribute('aria-expanded','false');
     });
     if(!expanded){
       wrap.classList.add('open');
@@ -426,17 +458,16 @@ document.querySelectorAll('.has-sub .sub-trigger').forEach(btn=>{
     }
   });
 });
-document.addEventListener('click', (e)=>{
-  const inMenu = e.target.closest('.has-sub');
+document.addEventListener('click',(e)=>{
+  const inMenu=e.target.closest('.has-sub');
   if(!inMenu){
     document.querySelectorAll('.has-sub').forEach(w=>{
       w.classList.remove('open');
       const b=w.querySelector('.sub-trigger');
-      if(b) b.setAttribute('aria-expanded','false');
+      if(b)b.setAttribute('aria-expanded','false');
     });
   }
 });
 </script>
-
 </body>
 </html>

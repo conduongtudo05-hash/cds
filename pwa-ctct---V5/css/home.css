@@ -217,3 +217,46 @@ header.nav .brand{ font-size: clamp(16px, 4.2vw, 20px); }
   /* đề phòng file nav.css cộng padding-top cho body khi sticky */
   body{ padding-top: 0 !important; }
 }
+
+/* === Trợ lý AI gọn hơn trên MOBILE (rộng ~300px, cách phải 18px) === */
+@media (max-width: 768px){
+  #ai-tray.ai-tray{
+    position: fixed;
+    bottom: 50px;           /* trên footer một chút */
+    right: 80px;            /* cách mép phải cho cân */
+    width: min(300px, 80vw);/* gọn hơn, tối đa 300px */
+    z-index: 9999;
+  }
+
+  #ai-tray .ai-tray__panel{
+    border-radius: 14px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.3);
+    overflow: hidden;
+  }
+
+  #ai-tray .ai-tray__head{
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  #ai-tray .ai-tray__messages{
+    max-height: 62vh;       /* thấp hơn để không che toàn màn hình */
+    padding: 8px 10px;
+    overflow: auto;
+  }
+
+  #ai-tray .ai-tray__form{
+    gap: 6px;
+    padding: 8px 10px;
+  }
+  #ai-tray .ai-tray__form input{
+    height: 36px;
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  #ai-tray .ai-tray__form button{
+    height: 36px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+}
