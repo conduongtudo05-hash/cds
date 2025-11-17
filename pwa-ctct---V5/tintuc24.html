@@ -243,18 +243,43 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
   }
 }
 @media (max-width:1024px){
-  /* Ẩn 3 tile dưới hero trong CHÍNH SÁCH MỚI */
   .p-mid{ display:none !important; }
 }
 @media (max-width:1024px){
   /* Link đang ở trang hiện tại trong drawer */
-  .m-menu .m-item[aria-current="page"]{
-    background: rgba(255,255,255,.16);
-    border-left: 3px solid #FFD966;
-    font-weight: 800;
-  }
+  .m-menu .m-item[aria-current="page"]{ background: rgba(255,255,255,.16); border-left: 3px solid #FFD966; font-weight: 800;  }
   /* Xoay caret khi phần cha đang mở */
   .m-drop[aria-expanded="true"] .caret{ transform: rotate(180deg); }
+}
+/* ==== TRA CỨU VĂN BẢN CHÍNH SÁCH ==== */
+.section-search{display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;}
+.section-search input{  flex:1; min-width:220px; padding:8px 10px; border-radius:8px; border:1px solid var(--border); font-size:14px;}
+.section-search select,
+.section-search button{  padding:8px 10px; border-radius:8px; border:1px solid var(--border); background:#fff;  font-size:14px;}
+.section-search button{ background:var(--accent); color:#fff; border-color:var(--accent-dark); cursor:pointer; white-space:nowrap;}
+.section-search button:hover{ background:var(--accent-dark);}
+#doc-results .muted{ padding:6px 0;}
+
+/* Thanh lọc dạng cuộn ngang cho mobile */
+.news-filter-bar{ display: flex; gap: .5rem; overflow-x: auto; padding-bottom: .5rem; margin-bottom: 1rem; scrollbar-width: none; align-items:center}
+.news-filter-bar::-webkit-scrollbar{ display:none; }
+.news-filter-bar select{
+  min-width:220px;
+  padding:.45rem .75rem;
+  border-radius:999px;
+  border:1px solid #e5e7eb;
+  font-size:.9rem;
+  background:#fff;
+}
+/* Nút lọc */
+.news-filter-btn{ white-space: nowrap; border:1px solid #e5e7eb; background:#fff; padding:.45rem .9rem; border-radius:999px; font-size:.875rem; cursor:pointer; color:#374151; transition:all .15s ease; flex-shrink: 0;}
+.news-filter-btn:hover{ background:#f3f4f6;}
+.news-filter-btn.is-active{ background:#A41919; color:#fff; border-color:#A41919;}
+
+/* Desktop tối ưu hiển thị */
+@media (min-width: 768px){
+  .news-filter-bar{flex-wrap: wrap; overflow-x: visible; }
+  .news-filter-btn{ padding:.5rem 1.2rem; font-size:.9rem;}
 }
 
 </style>
@@ -312,6 +337,26 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
 
 <div class="container">
 
+<div class="section" id="news-range">
+  <h2>📰 TIN THEO THỜI GIAN</h2>
+  <form id="news-range-form" class="news-filter-bar" onsubmit="return onSubmitNewsRange(event)">
+    <select id="news-range-select">
+      <option value="">-- Chọn khoảng thời gian --</option>
+      <option value="today">Trong ngày</option>
+      <option value="week">7 ngày qua</option>
+      <option value="month">30 ngày qua</option>
+      <option value="last-month">Tháng trước</option>
+      <option value="year">12 tháng qua</option>
+    </select>
+    <button type="submit" class="news-filter-btn">Xem tin</button>
+  </form>
+
+  <div id="news-range-results" class="policy-list">
+    <!-- Kết quả lọc tin sẽ hiển thị ở đây -->
+  </div>
+</div>
+
+
   <!-- 1) TIN TRONG NGÀY -->
   <section class="section" id="today">
     <h2>🔥 TIN TRONG NGÀY <span class="badge">VnExpress</span></h2>
@@ -332,6 +377,30 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
         <ul id="politics-hot" class="hot"></ul>
       </aside>
     </div>
+  </section>
+  <!-- 2.5) TRA CỨU VĂN BẢN CHÍNH SÁCH -->
+  <section class="section" id="doc-search">
+    <h2>🔎 TRA CỨU VĂN BẢN CHÍNH SÁCH</h2>
+    <form id="doc-search-form" class="section-search" onsubmit="return doDocSearch(event)">
+      <input id="doc-q" type="search"
+             placeholder="Nhập số / tên văn bản (vd: 24/2024/NĐ-CP, phụ cấp khu vực, nhà ở, tiền lương...)"/>
+      <select id="doc-type">
+        <option value="all">Tất cả loại văn bản</option>
+        <option value="NGHI_DINH">Nghị định</option>
+        <option value="THONG_TU">Thông tư</option>
+        <option value="QUYET_DINH">Quyết định</option>
+        <option value="CONG_VAN">Công văn</option>
+      </select>
+      <select id="doc-range">
+        <option value="all">Tất cả thời gian</option>
+        <option value="month">30 ngày qua</option>
+        <option value="year">12 tháng qua</option>
+      </select>
+      <button type="submit">Tìm kiếm</button>
+    </form>
+
+    <!-- Reuse layout 2 cột của policy-list -->
+    <div id="doc-results" class="policy-list"></div>
   </section>
 
   <!-- 3) CHÍNH SÁCH MỚI -->
@@ -378,7 +447,7 @@ a{color:inherit;text-decoration:none} a:hover{color:#dc2626}
 <script src="js/navbar.js" defer></script>
 <script>
 /* ====== CONFIG ====== */
-const API_BASE = 'https://script.google.com/macros/s/AKfycby0KuUYLsVLMVjk0XXMzE4j44XixzhXSp_YWKme15CzNYSUsTO5MUoIv5FdCxWM1KvSOQ/exec';
+const API_BASE = 'https://script.google.com/macros/s/AKfycbxtaSyUTCzMkkKFsuZm9PANCmYGOmFF9shDdFbo2VuZ1rreimkzdPSmv_8sfLw2aHMbfA/exec';
 const FALLBACK = 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?q=80&w=1200&auto=format&fit=crop';
 
 function jsonp(url){
@@ -424,10 +493,8 @@ function todayStripHTML(arr){
 }
 async function loadToday(){
   const data = await jsonp(API_BASE+'?action=listNews&source=vnexpress');
-  const seen=new Set();
-  todayItems=(data.items||[])
-    .filter(x=>x.title&&x.link&&x.image)
-    .filter(x=>{const k=x.image.split('?')[0];if(seen.has(k))return false;seen.add(k);return true;});
+  todayItems = dedupeNews(data.items || [])
+  .filter(x => x.title && x.link && x.image);
   if(!todayItems.length) return;
   renderTodayTop(todayItems[0]);
   document.getElementById('today-strip').innerHTML = todayStripHTML(todayItems);
@@ -454,7 +521,10 @@ async function loadPolitics(){
     jsonp(API_BASE+'?action=listNews&source=dangcongsan.hoatdong'),
     jsonp(API_BASE+'?action=listNews&source=dangcongsan.xaydung')
   ]);
-  polItems=[...(a.items||[]),...(b.items||[])].filter(x=>x.title&&x.link).sort((x,y)=>new Date(y.ts)-new Date(x.ts));
+  polItems = dedupeNews([...(a.items || []), ...(b.items || [])])
+  .filter(x => x.title && x.link)
+  .sort((x,y)=>new Date(y.ts)-new Date(x.ts));
+
   const f=document.getElementById('politics-feature');
   const h=document.getElementById('politics-hot');
   f.classList.remove('skeleton');
@@ -516,7 +586,9 @@ function renderPolicyList(){
 }
 async function loadPolicy(){
   const data=await jsonp(API_BASE+'?action=listNews&source=chinhphu');
-  policyItems=(data.items||[]).filter(x=>x.title&&x.link);
+  policyItems = dedupeNews(data.items || [])
+  .filter(x => x.title && x.link);
+
   if(!policyItems.length) return;
   renderPolicyTop(policyItems[0], policyItems.slice(1,6));
   renderPolicyMid(policyItems);
@@ -589,6 +661,162 @@ function classForSummary(text){
     if(a) close();
   });
 })();
+/* ===== LỌC TIN THEO THỜI GIAN (ALL SOURCE, NON-DUP) ===== */
+
+/** Chuyển chuỗi thời gian từ server thành Date an toàn */
+function parseItemDate(it){
+  const raw = it.ts || it.date;
+  if(!raw) return null;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+/** Tính khoảng thời gian (start, end) theo range */
+function getRangeBounds(range){
+  const now = new Date();
+  let start = null;
+  let end   = null;
+
+  if (range === 'today'){
+    start = new Date(now);
+    start.setHours(0,0,0,0);
+    end = new Date(start);
+    end.setDate(end.getDate()+1);
+  } else if (range === 'week'){
+    end = now;
+    start = new Date(now);
+    start.setDate(start.getDate()-7);
+  } else if (range === 'month'){
+    end = now;
+    start = new Date(now);
+    start.setDate(start.getDate()-30);
+  } else if (range === 'last-month'){
+    // Tháng trước (theo lịch): [day1 tháng trước; day1 tháng này)
+    end = new Date(now.getFullYear(), now.getMonth(), 1);            // 01 tháng này
+    start = new Date(end.getFullYear(), end.getMonth()-1, 1);        // 01 tháng trước
+  } else if (range === 'year'){
+    end = now;
+    start = new Date(now);
+    start.setFullYear(start.getFullYear()-1);
+  }
+  return { start, end };
+}
+
+// Chuẩn hoá tiêu đề để so sánh (bỏ khoảng trắng thừa, viết thường)
+function normalizeTitle(t){
+  return String(t || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Lọc trùng theo link (bỏ query) + theo tiêu đề
+function dedupeNews(items){
+  const seenLinks  = new Set();
+  const seenTitles = new Set();
+  const out = [];
+
+  (items || []).forEach(it => {
+    const rawLink = it.link || '';
+    const linkKey = rawLink
+      ? rawLink.split('#')[0].split('?')[0].toLowerCase()
+      : '';
+
+    const titleKey = normalizeTitle(it.title);
+
+    // Nếu trùng link → bỏ
+    if (linkKey && seenLinks.has(linkKey)) return;
+
+    // Nếu tiêu đề đã xuất hiện rồi → nhiều khả năng là cùng bài, bỏ bớt
+    if (titleKey && seenTitles.has(titleKey)) return;
+
+    if (linkKey)  seenLinks.add(linkKey);
+    if (titleKey) seenTitles.add(titleKey);
+
+    out.push(it);
+  });
+
+  return out;
+}
+
+/** Load tin theo khoảng thời gian (gọi khi bấm Tìm kiếm) */
+async function loadNewsRange(range){
+  const box  = document.getElementById('news-range-results');
+  const sel  = document.getElementById('news-range-select');
+
+  if (!range){
+    box.innerHTML = '<div class="muted">Anh chọn khoảng thời gian rồi bấm "Tìm kiếm" để xem tin.</div>';
+    return;
+  }
+
+  // cập nhật select (phòng khi gọi programmatically)
+  if (sel && sel.value !== range) sel.value = range;
+
+  box.innerHTML = '<div class="muted">Đang tải dữ liệu, vui lòng chờ…</div>';
+
+  const {start, end} = getRangeBounds(range);
+  // Gọi listNewsSince để lấy tin từ thời điểm start trở đi (nhiều nguồn)
+  const sinceIso = start ? start.toISOString() : '';
+  const url = sinceIso
+    ? `${API_BASE}?action=listNewsSince&since=${encodeURIComponent(sinceIso)}`
+    : `${API_BASE}?action=listNews`;
+
+  try{
+    const data  = await jsonp(url);
+    let items   = dedupeNews(data.items || []);
+
+    // Lọc lại phía client theo [start, end)
+    items = items.filter(it=>{
+      const d = parseItemDate(it);
+      if (!d) return false;
+      if (start && d < start) return false;
+      if (end   && d >= end)  return false;
+      return true;
+    });
+
+    // mới → cũ
+    items.sort((a,b)=>{
+      const da = parseItemDate(a) || new Date(0);
+      const db = parseItemDate(b) || new Date(0);
+      return db - da;
+    });
+
+    if (!items.length){
+      box.innerHTML = '<div class="muted">Chưa có bản tin nào trong khoảng thời gian đã chọn.</div>';
+      return;
+    }
+
+    box.innerHTML = items.map(it=>`
+      <article class="pl-item card">
+        <a href="${it.link}" target="_blank" rel="noopener">
+          <img src="${it.image || FALLBACK}" onerror="this.src='${FALLBACK}'" alt="">
+        </a>
+        <div>
+          <h4 class="clamp-2">
+            <a href="${it.link}" target="_blank" rel="noopener">${it.title || ''}</a>
+          </h4>
+          ${it.summary ? `<div class="desc clamp-3">${it.summary}</div>` : ''}
+          <div class="muted" style="margin-top:6px;font-size:13px">
+            ${new Date(it.ts || Date.now()).toLocaleString('vi-VN')}
+            ${it.source ? ' • ' + it.source : ''}
+          </div>
+        </div>
+      </article>
+    `).join('');
+  }catch(e){
+    console.error(e);
+    box.innerHTML = '<div class="muted">Có lỗi khi tải dữ liệu. Anh thử bấm lại "Tìm kiếm" sau ít phút.</div>';
+  }
+}
+
+/** Handler khi bấm nút Tìm kiếm */
+function onSubmitNewsRange(ev){
+  ev.preventDefault();
+  const sel   = document.getElementById('news-range-select');
+  const range = (sel && sel.value) ? sel.value : 'today';
+  loadNewsRange(range);
+  return false;
+}
 
 </script>
 </body>

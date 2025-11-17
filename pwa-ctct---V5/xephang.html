@@ -1,394 +1,383 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PTKV3 • Bảng Xếp Hạng Huấn Luyện Chính Trị</title>
-<meta name="theme-color" content="#A41919" />
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Bảng xếp hạng – PTKV3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --primary:#A41919;
-    --gold:#FFD966;
-    --bg:#fafafa;
-    --text:#111827;
-    --muted:#6b7280;
-    --ring:#e5e7eb;
-    --card:#ffffff;
-    --radius:14px;
+:root{
+  --primary:#A41919; --accent:#FFD966; --bg:#FFF8ED; --text:#0f172a;
+  --muted:#6b7280; --border:#e5e7eb; --radius:14px;
+  --panel:#0f253f; --panel-2:#122b48; --shadow:0 14px 34px rgba(0,0,0,.22), 0 3px 10px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:var(--text);background:var(--bg);display:flex;flex-direction:column}
+
+/* ===== Header/ Footer (đồng bộ Hoctap.html) ===== */
+.header{position:sticky;top:0;z-index:50;font-weight:600;background:linear-gradient(90deg,#7f1d1d,#b91c1c 45%,#dc2626);color:#fff}
+.nav{max-width:1200px;margin:auto;display:flex;gap:18px;align-items:center;padding:12px 16px}
+.nav .brand{font-weight:800}
+.nav a{color:#fff;padding:6px 10px;border-radius:8px;text-decoration:none}
+.nav a[aria-current="page"]{background:rgba(0,0,0,.18)}
+.nav a:hover{color:var(--accent);transform:scale(1.04)}
+.footer{margin-top:40px;background:#111827;color:#cbd5e1}
+.footer .wrap{max-width:1200px;margin:auto;padding:20px 16px;font-size:14px;text-align:center}
+
+/* Dropdown (desktop) */
+.nav .has-dropdown{position:relative}
+.nav .has-dropdown > a{display:inline-flex;align-items:center;gap:6px}
+.nav .dropdown{
+  position:absolute;top:calc(100% + 8px);left:0;min-width:220px;display:none;
+  background:#1f2937;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:8px;z-index:60
+}
+.nav .dropdown a{display:block;color:#e5e7eb}
+.nav .has-dropdown:hover .dropdown{display:block}
+
+/* ===== Mobile drawer ===== */
+/* Ẩn mặc định trên desktop */
+.m-drawer{display:none}
+.m-backdrop{display:none}
+[hidden]{display:none!important}
+
+.m-toggle{display:none!important;background:transparent;border:0;color:#fff;font-size:28px;line-height:1}
+
+@media (max-width:1024px){
+  .nav a:not(.brand), .nav .has-dropdown{display:none!important}
+  .m-toggle{display:block!important;margin-left:auto}
+
+  .m-drawer{
+    display:block;                      /* chỉ hiện ở mobile */
+    position:fixed; inset:0 auto 0 0; width:86vw; max-width:420px;
+    transform:translateX(-100%);
+    background:linear-gradient(180deg,#7f1d1d,#b91c1c 55%,#9d1414);
+    color:#fff; z-index:120; transition:transform .25s ease;
+    box-shadow:4px 0 30px rgba(0,0,0,.25);
   }
-  *{box-sizing:border-box}
-  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Be Vietnam Pro",Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-  a{color:inherit;text-decoration:none}
-  .container{max-width:1200px;margin:0 auto;padding:16px}
-  header.site{
-    position:sticky;top:0;z-index:30;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);
-    border-bottom:1px solid var(--ring);
+  .m-head{display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid rgba(255,255,255,.12)}
+  .m-home{font-size:22px; text-decoration:none; color:#fff}
+  .m-brand{font-weight:800; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .m-close{margin-left:auto; background:0 0; border:0; color:#fff; font-size:28px; cursor:pointer}
+
+  .m-menu{padding:8px 8px 18px}
+  .m-item{display:block; color:#fff; padding:14px 10px; font-weight:600; border-bottom:1px solid rgba(255,255,255,.08); text-decoration:none}
+  .m-sub{display:flex; flex-direction:column; gap:6px; padding:10px 10px 12px}
+  .m-sub[hidden]{display:none!important}
+  .m-drop .caret{float:right}
+  .m-drop[aria-expanded="true"] .caret{transform:rotate(180deg)}
+
+  .m-backdrop{display:block; position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(2px);
+    z-index:110; opacity:0; transition:opacity .25s; pointer-events:none}
+  body.menu-open .m-drawer{transform:translateX(0)}
+  body.menu-open .m-backdrop{opacity:1; pointer-events:auto}
+  body.no-scroll{overflow:hidden}
+
+  .m-menu .m-item[aria-current="page"]{
+    background: rgba(255,255,255,.16);
+    border-left: 3px solid #FFD966;
+    font-weight: 800;
   }
-  .site-inner{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:800}
-  .brand .logo{width:28px;height:28px;border-radius:50%;background:var(--primary);position:relative;box-shadow:0 0 0 3px rgba(164,25,25,.1)}
-  .brand .logo:after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--gold)}
-  .site-nav{display:flex;gap:14px;font-weight:600}
-  .site-nav a{opacity:.85}
-  .site-nav a.active{color:var(--primary);opacity:1}
-  /* Hero */
-  .hero{
-    margin-top:12px;background:linear-gradient(135deg, rgba(164,25,25,.06), rgba(255,217,102,.10));
-    border:1px solid var(--ring);border-radius:var(--radius);padding:24px;
-  }
-  .hero h1{margin:0 0 6px 0;font-size:28px;letter-spacing:.2px}
-  .hero p{margin:0;color:var(--muted)}
-  /* Filter bar */
-  .filters{margin-top:14px;display:flex;flex-wrap:wrap;gap:10px}
-  .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--ring);border-radius:999px;background:#fff;cursor:pointer;font-weight:600}
-  .pill[aria-pressed="true"]{border-color:var(--primary);color:#fff;background:var(--primary)}
-  .spacer{flex:1 1 auto}
-  /* Layout main */
-  .grid{
-    display:grid;gap:16px;margin-top:16px;
-    grid-template-columns:1.4fr .6fr; /* main + aside */
-  }
-  /* Top 3 */
-  .top3{display:grid;gap:16px;grid-template-columns:repeat(3,minmax(0,1fr))}
-  .card{background:var(--card);border:1px solid var(--ring);border-radius:var(--radius);padding:16px;box-shadow:0 6px 14px rgba(0,0,0,.03)}
-  .top-card{position:relative;overflow:hidden}
-  .medal{position:absolute;right:12px;top:12px;padding:4px 10px;border-radius:999px;background:#fff;border:1px solid var(--ring);font-weight:700}
-  .medal.gold{background:linear-gradient(180deg,#ffe8a6,#ffd34d);border:none}
-  .medal.silver{background:linear-gradient(180deg,#f2f4f7,#e5e7eb)}
-  .medal.bronze{background:linear-gradient(180deg,#f3d6b8,#e5b88c)}
-  .avatar{width:54px;height:54px;border-radius:50%;background:var(--primary);display:inline-block;box-shadow:0 0 0 3px rgba(164,25,25,.15)}
-  .top-name{margin-top:10px;font-weight:800}
-  .top-unit{color:var(--muted);font-size:13px}
-  .top-score{margin-top:8px;font-weight:700}
-  .progress{height:8px;background:#f1f5f9;border-radius:999px;overflow:hidden;margin-top:10px}
-  .progress>div{height:100%;background:var(--primary);width:0%}
-  /* Table */
-  .table-wrap{margin-top:16px}
-  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--ring);border-radius:var(--radius);overflow:hidden}
-  thead th{background:#fafafa;color:#374151;font-weight:700;text-align:left;border-bottom:1px solid var(--ring);padding:12px}
-  tbody td{border-bottom:1px solid var(--ring);padding:12px;vertical-align:middle}
-  tbody tr:hover{background:#fcfcfd}
-  .rank{font-weight:800}
-  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border:1px solid var(--ring);border-radius:999px;font-size:12px;background:#fff}
-  .mini{height:6px;background:#f1f5f9;border-radius:8px;overflow:hidden}
-  .mini>div{height:100%;background:var(--primary);width:0%}
-  /* Aside */
-  aside{display:flex;flex-direction:column;gap:16px}
-  .chart-box canvas{width:100%;height:180px}
-  .ai-box .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-  .ai-box .chips .chip{cursor:pointer}
-  .empty{padding:18px;border:1px dashed var(--ring);border-radius:var(--radius);text-align:center;color:var(--muted)}
-  /* Footer */
-  footer.site{margin-top:20px;border-top:1px solid var(--ring);padding:16px 0;color:var(--muted);font-size:14px}
-  /* Mobile */
-  @media (max-width: 1060px){
-    .grid{grid-template-columns:1fr}
-  }
-  @media (max-width: 720px){
-    .site-nav{display:none}
-    .hero h1{font-size:22px}
-    .top3{grid-template-columns:1fr}
-  }
-  /* Bottom nav (mobile) */
-  .bottom-nav{
-    position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--ring);
-    display:none;justify-content:space-around;gap:8px;padding:10px 8px;z-index:40
-  }
-  .bottom-nav a{font-weight:700;text-align:center}
-  .bottom-nav svg{display:block;margin:0 auto 2px auto}
-  @media (max-width: 720px){
-    .bottom-nav{display:flex}
-    body{padding-bottom:64px}
-  }
+}
+
+/* ===== Title ribbon ===== */
+.title{
+  width:100%;min-height:44px;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#9F1B16 0%, #7F1212 100%);color:#FFD966;
+  font-weight:900;letter-spacing:.5px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.08)
+}
+
+/* ===== Main ===== */
+main{flex:1 0 auto}
+.container{max-width:1200px;margin:22px auto 30px;padding:0 16px}
+
+/* Controls */
+.controls{
+  display:grid;grid-template-columns:1fr auto auto auto auto;gap:10px;
+  background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:0 8px 18px rgba(0,0,0,.06)
+}
+.controls .search{position:relative}
+.controls .search input{
+  width:100%;padding:12px 12px 12px 36px;border-radius:999px;border:1px solid var(--border);background:#fff;color:#111
+}
+.controls .search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:.65}
+select,.btn{appearance:none;padding:12px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:#111;font-weight:600;cursor:pointer}
+.btn.primary{background:linear-gradient(180deg,#FFD966,#E6C34D);color:#5b4300;border:0}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tab{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:#fff;color:#111;font-weight:800;cursor:pointer}
+.tab.active{background:#FFD966;color:#5b4300}
+
+/* Table card */
+.card{background:linear-gradient(180deg,var(--panel),var(--panel-2));border-radius:18px;border:1px solid rgba(0,0,0,.08);box-shadow:var(--shadow);color:#fff}
+.table-wrap{overflow:auto;border-radius:18px}
+.table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}
+.table th,.table td{padding:12px 14px;text-align:left}
+.table thead th{position:sticky;top:0;background:#0f253f;color:#dbeafe;z-index:1;border-bottom:1px solid rgba(255,255,255,.08)}
+.table tr:not(:first-child) td{border-top:1px solid rgba(255,255,255,.06)}
+.badge-rank{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;border-radius:10px;font-weight:800;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15)}
+.badge-rank.top1{background:linear-gradient(180deg,#ffd966,#e6c34d);color:#5b4300}
+.badge-rank.top2{background:#e5e7eb;color:#111827}
+.badge-rank.top3{background:#f59e0b;color:#1f2937}
+.pill{display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:#fff;border:1px solid var(--border);color:#374151}
+
+/* Mobile layout */
+@media (max-width:960px){
+  .controls{grid-template-columns:1fr 1fr 1fr;grid-auto-rows:auto}
+  .controls .search{grid-column:1/-1}
+}
+@media (max-width:640px){
+  .title{font-size:16px}
+  .controls{grid-template-columns:1fr 1fr;grid-auto-rows:auto}
+  .controls .search{grid-column:1/-1}
+  .tab{flex:1;text-align:center}
+}
+/* Rất nhỏ: đổi hàng bảng thành thẻ */
+@media (max-width:560px){
+  .table{min-width:0}
+  .table thead{display:none}
+  .table tr{display:block;border-top:1px solid rgba(255,255,255,.1);padding:10px 12px}
+  .table td{display:block;padding:6px 0}
+  .table td:first-child{padding-top:0}
+}
+
 </style>
 </head>
 <body>
 
-<header class="site">
-  <div class="container site-inner">
-    <div class="brand">
-      <span class="logo" aria-hidden="true"></span>
-      PTKV3 • Bảng Xếp Hạng
+<!-- ===== HEADER ===== -->
+<header class="header">
+  <nav class="nav" role="navigation" aria-label="Điều hướng chính">
+    <a class="brand" href="index.html">BAN CHỈ HUY PTKV3</a>
+    <a href="index.html">Trang chủ</a>
+    <a href="tintuc24.html">Tin tức</a>
+    <a href="Hoctap.html">Học tập</a>
+    <a href="kiemtra.html">Kiểm tra</a>
+    <div class="nav__item has-dropdown">
+      <a href="#" aria-haspopup="true" aria-expanded="false">Kết quả kiểm tra ▾</a>
+      <div class="dropdown" role="menu" aria-label="Kết quả kiểm tra">
+        <a href="my-results.html" role="menuitem">Kết quả của tôi</a>
+        <a href="leaderboard.html" role="menuitem" aria-current="page">Bảng xếp hạng</a>
+      </div>
     </div>
-    <nav class="site-nav" aria-label="Điều hướng chính">
-      <a href="index.html">Trang chủ</a>
-      <a href="news.html">Tin tức</a>
-      <a href="materials.html">Học tập</a>
-      <a class="active" href="leaderboard.html" aria-current="page">Xếp hạng</a>
-      <a href="exam.html">Kiểm tra</a>
-      <a href="auth.html">Đăng nhập</a>
-    </nav>
-  </div>
+    <div class="sp"></div>
+    <button class="m-toggle" aria-label="Mở menu">☰</button>
+  </nav>
 </header>
 
-<main class="container">
-  <!-- Hero -->
-  <section class="hero" aria-labelledby="hero-title">
-    <h1 id="hero-title">VINH DANH TẬP THỂ & CÁ NHÂN XUẤT SẮC</h1>
-    <p>Bảng xếp hạng huấn luyện chính trị — cập nhật theo thời gian thực.</p>
-    <div class="filters" role="toolbar" aria-label="Bộ lọc xếp hạng">
-      <button class="pill" data-period="tuan" aria-pressed="true">Tuần này</button>
-      <button class="pill" data-period="thang" aria-pressed="false">Tháng này</button>
-      <button class="pill" data-period="nam" aria-pressed="false">Năm nay</button>
-      <span class="spacer"></span>
-      <button class="pill" data-entity="ca-nhan" aria-pressed="true">Cá nhân</button>
-      <button class="pill" data-entity="don-vi" aria-pressed="false">Đơn vị</button>
+<!-- ===== MOBILE DRAWER ===== -->
+<aside id="mDrawer" class="m-drawer" aria-hidden="true" role="dialog" aria-label="Menu">
+  <div class="m-head">
+    <a class="m-home" href="index.html" aria-label="Trang chủ" title="Trang chủ">🏠</a>
+    <span class="m-brand">BAN CHỈ HUY PTKV3</span>
+    <button class="m-close" aria-label="Đóng menu">✕</button>
+  </div>
+  <nav class="m-menu" role="navigation" aria-label="Menu di động">
+    <a class="m-item" href="index.html">Trang chủ</a>
+    <a class="m-item" href="tintuc24.html">Tin tức</a>
+    <a class="m-item" href="Hoctap.html">Học tập</a>
+    <a class="m-item" href="kiemtra.html">Kiểm tra</a>
+    <button class="m-item m-drop" data-target="#m-result" aria-controls="m-result" aria-expanded="false">
+      Kết quả kiểm tra <span class="caret">▾</span>
+    </button>
+    <div id="m-result" class="m-sub" hidden>
+      <a href="my-results.html">Kết quả của tôi</a>
+      <a href="leaderboard.html" aria-current="page">Bảng xếp hạng</a>
     </div>
-  </section>
+  </nav>
+</aside>
+<div class="m-backdrop" hidden></div>
 
-  <section class="grid" aria-label="Nội dung xếp hạng">
-    <!-- Main Column -->
-    <div>
-      <!-- Top 3 -->
-      <div class="top3" id="top3" aria-label="Top 3 vinh danh">
-        <!-- Cards render by JS -->
+<div class="title">BẢNG XẾP HẠNG</div>
+
+<main>
+  <div class="container">
+    <!-- Controls -->
+    <div class="controls" role="region" aria-label="Bộ lọc xếp hạng">
+      <div class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.35-4.35M11 19a8 8 0 1 1 0-16 8 8 0 0 1 0 16Z" stroke="#111" stroke-width="2" opacity=".6"/></svg>
+        <input id="q" placeholder="Tìm tên, đơn vị...">
       </div>
+      <select id="exam"><option value="">— Tất cả kỳ thi —</option></select>
+      <select id="range">
+        <option value="day">Hôm nay</option>
+        <option value="week" selected>Tuần này</option>
+        <option value="month">Tháng này</option>
+        <option value="year">Năm nay</option>
+        <option value="all">Tất cả</option>
+      </select>
+      <select id="sort">
+        <option value="percent">% cao nhất</option>
+        <option value="correct">Số đúng</option>
+        <option value="time">Thời gian (nhanh)</option>
+        <option value="submittedAt">Mới nhất</option>
+      </select>
+      <button class="btn primary" id="btnRefresh">Làm mới</button>
+    </div>
 
-      <!-- Table -->
-      <div class="table-wrap card" style="margin-top:16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <strong>Bảng xếp hạng</strong>
-          <span class="chip" id="summaryChip">0 người • 0% hoàn thành TB</span>
-        </div>
-        <div id="tableEmpty" class="empty" hidden>Chưa có dữ liệu xếp hạng.</div>
-        <table id="lbTable" aria-label="Bảng xếp hạng" hidden>
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab active" role="tab" aria-selected="true" id="tab-individual">Cá nhân</button>
+      <button class="tab" role="tab" aria-selected="false" id="tab-unit">Tập thể</button>
+    </div>
+
+    <!-- Board -->
+    <section class="card" id="board">
+      <div class="table-wrap">
+        <table class="table" aria-describedby="caption">
+          <caption id="caption" style="position:absolute;left:-9999px">Bảng xếp hạng</caption>
           <thead>
             <tr>
-              <th>Hạng</th>
+              <th style="width:80px">#</th>
               <th>Họ tên / Đơn vị</th>
-              <th>Điểm</th>
-              <th>Hoàn thành</th>
-              <th style="width:140px">Tiến độ</th>
+              <th style="width:120px">% đúng</th>
+              <th style="width:120px">Đúng/Tổng</th>
+              <th style="width:150px">Thời gian</th>
+              <th style="width:170px">Nộp lúc</th>
             </tr>
           </thead>
-          <tbody id="lbBody"></tbody>
+          <tbody id="tbody"></tbody>
         </table>
       </div>
-    </div>
+    </section>
 
-    <!-- Aside -->
-    <aside>
-      <div class="card chart-box">
-        <strong>Thống kê điểm trung bình</strong>
-        <canvas id="scoreChart" aria-label="Biểu đồ điểm trung bình" role="img"></canvas>
-      </div>
-
-      <div class="card ai-box">
-        <strong>AI Insights</strong>
-        <p id="aiText" style="margin:.25rem 0;color:var(--muted)">AI nhận xét sẽ hiển thị khi có dữ liệu thực.</p>
-        <div class="chips">
-          <span class="chip" data-ai="chu-de">Chủ đề học nhiều</span>
-          <span class="chip" data-ai="yeu-diem">Nhóm yếu điểm</span>
-          <span class="chip" data-ai="de-xuat">Đề xuất ôn tập</span>
-        </div>
-      </div>
-    </aside>
-  </section>
+    <div class="pill" id="status" style="margin-top:10px;display:inline-flex">Đang tải...</div>
+  </div>
 </main>
 
-<footer class="site">
-  <div class="container">
-    © PTKV3 – Trung tâm Giáo dục Chính trị Số • <a href="#">Liên hệ</a> • <a href="#">Hướng dẫn</a>
+<footer class="footer">
+  <div class="wrap">
+    <strong>PTKV3 • Trung tâm Giáo dục Chính trị số © 2025</strong>
   </div>
 </footer>
 
-<!-- Bottom navigation (mobile) -->
-<nav class="bottom-nav" aria-label="Điều hướng chân trang">
-  <a href="index.html" aria-label="Trang chủ">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 10L12 3l9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1V10z" fill="currentColor"/></svg>
-    Trang chủ
-  </a>
-  <a href="materials.html" aria-label="Học tập">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 5h16v12H4z" stroke="currentColor" stroke-width="2"/><path d="M4 9h16" stroke="currentColor" stroke-width="2"/></svg>
-    Học tập
-  </a>
-  <a href="exam.html" aria-label="Thi">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M7 4h10v16H7z" stroke="currentColor" stroke-width="2"/><path d="M9 8h6M9 12h6M9 16h6" stroke="currentColor" stroke-width="2"/></svg>
-    Thi
-  </a>
-  <a href="leaderboard.html" class="active" aria-current="page" aria-label="Xếp hạng">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M4 14h4v6H4zM10 10h4v10h-4zM16 6h4v14h-4z" fill="currentColor"/></svg>
-    Xếp hạng
-  </a>
-  <a href="auth.html" aria-label="Tôi">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="currentColor" stroke-width="2"/></svg>
-    Tôi
-  </a>
-</nav>
+<!-- ===== CẤU HÌNH API (đặt URL Apps Script thật của anh) ===== -->
+<script>
+  window.PTKV3_API = window.PTKV3_API || 'https://script.google.com/macros/s/AKfycbyxGPfoT01trif5STewllIlvyIn_6nYu1VaYYrFAPAuRkKs_wIKOEk4xXHamWFC0Auagg/exec';
+</script>
 
 <script>
-/** ================== CẤU HÌNH BACKEND ================== */
-window.PTKV3_API = window.PTKV3_API || ''; // <- ĐIỀN URL Web App thực tế trước khi dùng
+/** ===== Utils ===== */
+const $=(s,r=document)=>r.querySelector(s); const qs=(s,r=document)=>[...r.querySelectorAll(s)];
+const pad=n=>String(n).padStart(2,'0');
+const pct=n=>(n==null||isNaN(n))?'—':n.toFixed(0)+'%';
+const fmtTime=sec=>{if(sec==null||isNaN(sec))return'—';const h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h?`${pad(h)}:${pad(m)}:${pad(s)}`:`${pad(m)}:${pad(s)}`};
+const fmtDate=iso=>{if(!iso)return'—';const d=new Date(iso);if(isNaN(d))return iso;return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+function escapeHtml(str){return (str==null)?'':String(str).replace(/[&<>"']/g,s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]))}
 
-/** ================== TIỆN ÍCH UI ================== */
-const $ = (s, r=document)=> r.querySelector(s);
-const $$ = (s, r=document)=> Array.from(r.querySelectorAll(s));
-function setPressed(btns, attr, value){
-  btns.forEach(b=> b.setAttribute('aria-pressed', String(b.getAttribute(attr)===value)));
-}
-function empty(node, msg){
-  node.innerHTML = '';
-  const div = document.createElement('div');
-  div.className = 'empty'; div.textContent = msg;
-  node.append(div);
-}
-
-/** ================== GỌI API ================== */
-async function apiCall(action, payload={}){
-  if(!window.PTKV3_API){ throw new Error('Chưa cấu hình window.PTKV3_API'); }
-  const res = await fetch(window.PTKV3_API, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({ action, payload })
-  });
-  const json = await res.json();
-  if(!json.ok) throw new Error(json.error || 'Lỗi không xác định');
-  return json.data || {};
-}
-
-/** ================== VẼ BIỂU ĐỒ ================== */
-function drawBars(canvas, values){
-  const ctx = canvas.getContext('2d');
-  const w = canvas.width = canvas.clientWidth;
-  const h = canvas.height = 180;
-  ctx.clearRect(0,0,w,h);
-  const pad = 18;
-  const max = Math.max(1, ...values);
-  const bw = (w - pad*2) / values.length * 0.6;
-  values.forEach((v,i)=>{
-    const x = pad + i * ((w - pad*2) / values.length) + ( ((w - pad*2)/values.length) - bw )/2;
-    const y = h - pad - (v/max)*(h - pad*2);
-    ctx.fillStyle = getComputedStyle(document.documentElement).getPropertyValue('--primary');
-    ctx.fillRect(x, y, bw, h - pad - y);
-  });
-}
-
-/** ================== BỐ TRÍ & KẾT XUẤT ================== */
-function renderTop3(list){
-  const box = $('#top3'); box.innerHTML = '';
-  const top = list.slice(0,3);
-  const medals = ['gold','silver','bronze'];
-  top.forEach((r, i)=>{
-    const card = document.createElement('div');
-    card.className = 'card top-card';
-    card.innerHTML = `
-      <span class="medal ${medals[i]}">#${i+1}</span>
-      <span class="avatar" aria-hidden="true"></span>
-      <div class="top-name">${escapeHtml(r.ten || r['ma'] || '—')}</div>
-      <div class="top-unit">${escapeHtml(r.donvi || r['doi-tuong'] || '')}</div>
-      <div class="top-score">Điểm: ${fmtScore(r.diem)}</div>
-      <div class="progress"><div style="width:${Number(r.hoan_thanh||r['hoan-thanh']||0)}%"></div></div>
-    `;
-    box.append(card);
-  });
-  if(!top.length){ empty(box,'Chưa có dữ liệu Top 3.'); }
-}
-
-function renderTable(list, entity){
-  const tbody = $('#lbBody'); tbody.innerHTML = '';
-  const table = $('#lbTable'); const emptyEl = $('#tableEmpty');
-  if(!list.length){ table.hidden = true; emptyEl.hidden = false; return; }
-  table.hidden = false; emptyEl.hidden = true;
-
-  list.forEach((r, idx)=>{
-    const tr = document.createElement('tr');
-    const name = escapeHtml(r.ten || r['ma'] || '—');
-    const unit = escapeHtml(r.donvi || r['doi-tuong'] || '');
-    const done = Number(r.hoan_thanh||r['hoan-thanh']||0);
-    tr.innerHTML = `
-      <td class="rank">#${idx+1}</td>
-      <td>
-        <div style="font-weight:700">${name}</div>
-        <div style="color:var(--muted);font-size:12px">${entity==='don-vi' ? 'Đơn vị' : 'Đơn vị'}: ${unit || '—'}</div>
-      </td>
-      <td>${fmtScore(r.diem)}</td>
-      <td>${done}%</td>
-      <td>
-        <div class="mini"><div style="width:${done}%"></div></div>
-      </td>
-    `;
-    tbody.append(tr);
-  });
-
-  // Summary chip
-  const avg = Math.round(list.reduce((a,b)=> a + (Number(b.hoan_thanh||b['hoan-thanh']||0)), 0) / list.length);
-  $('#summaryChip').textContent = `${list.length} ${entity==='don-vi'?'đơn vị':'người'} • ${isFinite(avg)?avg:0}% hoàn thành TB`;
-}
-
-function fmtScore(v){
-  if(v==null||v==='') return '—';
-  const n = Number(v);
-  if(isNaN(n)) return String(v);
-  return n.toFixed(2).replace(/\.00$/,'');
-}
-function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[m]); }
-
-/** ================== TẢI DỮ LIỆU ================== */
-async function loadLeaderboard(){
-  const periodBtn = $$('.pill[data-period]').find(b=> b.getAttribute('aria-pressed')==='true');
-  const entityBtn = $$('.pill[data-entity]').find(b=> b.getAttribute('aria-pressed')==='true');
-  const period = periodBtn ? periodBtn.dataset.period : 'tuan';
-  const entity = entityBtn ? entityBtn.dataset.entity : 'ca-nhan';
-
-  try{
-    const data = await apiCall('xep-hang.xem', { 'chu-ky':period, 'doi-tuong': entity==='don-vi'?'đơn vị':'cá nhân' });
-    const items = (data.items||[]).map(x=>{
-      return {
-        ten: x.ten || x['ma'] || x['Mã/Đơn vị'] || x['ma'],
-        donvi: x.donvi || x['Đơn vị'] || x['doi-tuong'] || '',
-        diem: x.diem ?? x['diem'],
-        hoan_thanh: x.hoan_thanh ?? x['hoan-thanh'] ?? x['Hoàn thành'] ?? 0
-      };
-    });
-    renderTop3(items);
-    renderTable(items, entity);
-
-    // Chart: lấy 10 điểm đầu làm minh họa phân phối (không demo — nếu ít dữ liệu sẽ vẽ tương ứng)
-    const vals = items.slice(0,10).map(it=> Number(it.diem||0));
-    drawBars($('#scoreChart'), vals.length? vals : [0,0,0,0,0]);
-
-    // AI insights: nếu có items → hiển thị gợi ý chung (không dùng dữ liệu giả)
-    $('#aiText').textContent = items.length
-      ? 'AI nhận xét: Hãy động viên Top 3 và hỗ trợ nhóm có tỷ lệ hoàn thành thấp.'
-      : 'Chưa có dữ liệu để AI đưa nhận xét.';
-  }catch(err){
-    console.error(err);
-    renderTop3([]);
-    $('#lbTable').hidden = true; $('#tableEmpty').hidden = false;
-    $('#aiText').textContent = 'Không thể tải dữ liệu. Vui lòng kiểm tra endpoint.';
-    drawBars($('#scoreChart'), [0,0,0,0,0]);
-  }
-}
-
-/** ================== SỰ KIỆN UI ================== */
-document.addEventListener('click', (e)=>{
-  const p = e.target.closest('.pill');
-  if(!p) return;
-  if(p.dataset.period){
-    setPressed($$('.pill[data-period]'), 'data-period', p.dataset.period);
-  }
-  if(p.dataset.entity){
-    setPressed($$('.pill[data-entity]'), 'data-entity', p.dataset.entity);
-  }
-  loadLeaderboard();
-});
-$$('.ai-box .chip').forEach(ch=>{
-  ch.addEventListener('click', ()=>{
-    const kind = ch.dataset.ai;
-    const map = {
-      'chu-de': 'AI: Chủ đề học nhiều tuần này là “Tư tưởng Hồ Chí Minh”.',
-      'yeu-diem': 'AI: Nên bồi dưỡng nhóm “Luật quốc phòng” cho đối tượng mới.',
-      'de-xuat': 'AI: Đề xuất mở lớp ôn tập chuyên đề “Đường lối Quốc phòng 2025”.'
+/** Chuẩn hoá record từ API */
+function normalizeItem(raw, group){
+  const r = raw || {};
+  if(group === 'unit'){
+    return {
+      unit: r.unit || r.donVi || r.team || '',
+      percent: Number(r.percent ?? r.avgPercent ?? r.scorePercent ?? r.percentCorrect ?? 0),
+      count: Number(r.count ?? r.soNguoi ?? r.memberCount ?? 0),
+      correct: null, total: null, durationSec: null, submittedAt: null
     };
-    $('#aiText').textContent = map[kind] || 'AI: Đang phân tích...';
-  });
-});
+  }
+  return {
+    fullName: r.fullName || r.hoTen || r.name || '',
+    unit: r.unit || r.donVi || r.team || '',
+    percent: Number(r.percent ?? r.scorePercent ?? r.percentCorrect ?? 0),
+    correct: Number(r.correct ?? r.right ?? r.dung ?? 0),
+    total: Number(r.total ?? r.tong ?? r.questions ?? 0),
+    durationSec: Number(r.durationSec ?? r.timeSec ?? r.seconds ?? 0),
+    submittedAt: r.submittedAt || r.ts || r.createdAt || r.submitted_time || ''
+  };
+}
 
-/** ================== KHỞI TẠO ================== */
-window.addEventListener('DOMContentLoaded', ()=>{
-  // Gợi ý: set window.PTKV3_API tại đây trước khi gọi loadLeaderboard
-  // window.PTKV3_API = 'https://script.google.com/macros/s/XXXX/exec';
-  loadLeaderboard();
-});
+/** ===== State ===== */
+const state={tab:'individual',examId:'',range:'week',sort:'percent',q:''};
+const AUTO_REFRESH_MS=60_000;
+
+/** ===== Render ===== */
+function setStatus(t){const el=$('#status');el.textContent=t||'';el.style.display=t?'inline-flex':'none'}
+function headerByTab(){
+  const ths=qs('.table thead th');
+  if(state.tab==='unit'){ths[1].textContent='Đơn vị';ths[2].textContent='% trung bình';ths[3].textContent='Quy mô';ths[4].textContent='—';ths[5].textContent='—';}
+  else{ths[1].textContent='Họ tên / Đơn vị';ths[2].textContent='% đúng';ths[3].textContent='Đúng/Tổng';ths[4].textContent='Thời gian';ths[5].textContent='Nộp lúc';}
+}
+function rows(items){
+  const tb=$('#tbody');tb.innerHTML='';
+  if(!items?.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:#cbd5e1;padding:18px">Không có dữ liệu</td></tr>';return}
+  items.forEach((it,i)=>{
+    const rank=i+1, cls=rank===1?'top1':rank===2?'top2':rank===3?'top3':'';
+    const name=state.tab==='unit'?(it.unit||'—'):(it.fullName||'—');
+    const unit=state.tab==='unit'?(it.count?`${it.count} người`:'' ):(it.unit||'');
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><span class="badge-rank ${cls}">${rank}</span></td>
+      <td><div style="font-weight:800;color:#fff">${escapeHtml(name)}</div><div style="opacity:.85;font-size:12px;color:#d1d5db">${escapeHtml(unit)}</div></td>
+      <td>${pct(it.percent)}</td>
+      <td>${it.correct!=null?`${it.correct}/${it.total}`:'—'}</td>
+      <td>${fmtTime(it.durationSec)}</td>
+      <td>${fmtDate(it.submittedAt)}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/** ===== API ===== */
+async function exams(){
+  if(!window.PTKV3_API) throw new Error('Thiếu cấu hình API');
+  const rs=await fetch(window.PTKV3_API+'?action=leaderboard&meta=exams',{cache:'no-store'});
+  const j=await rs.json().catch(()=>null);
+  const arr = j?.exams || j?.data?.exams || [];
+  return Array.isArray(arr) ? arr : [];
+}
+async function board(){
+  if(!window.PTKV3_API){setStatus('Thiếu cấu hình API (window.PTKV3_API)');return}
+  setStatus('Đang tải xếp hạng…');
+  const p=new URLSearchParams({action:'leaderboard',group:state.tab,range:state.range,sort:state.sort,examId:state.examId||''});
+  const rs=await fetch(window.PTKV3_API+'?'+p.toString(),{cache:'no-store'});
+  if(!rs.ok){setStatus('Lỗi HTTP '+rs.status);return}
+  const j=await rs.json().catch(()=>null);
+  if(!j){setStatus('API rỗng');return}
+  const rawItems = (j.items || j.data?.items || j.results || []);
+  let items = rawItems.map(it => normalizeItem(it, state.tab));
+  if(state.q){const q=state.q.toLowerCase();items=items.filter(it=>{const name=state.tab==='unit'?(it.unit||''):(it.fullName||'');const unit=it.unit||'';return name.toLowerCase().includes(q)||unit.toLowerCase().includes(q)})}
+  rows(items); setStatus('');
+}
+
+/** ===== Init ===== */
+(function init(){
+  // Drawer mobile
+  const drawer=$('#mDrawer'),backdrop=document.querySelector('.m-backdrop'),openBtn=document.querySelector('.m-toggle'),closeBtn=drawer?.querySelector('.m-close');
+  const focusables='a,button,[tabindex]:not([tabindex="-1"])'; let lastFocus=null;
+  document.querySelectorAll('.m-sub').forEach(p=>p.hidden=true);
+  document.querySelectorAll('.m-drop').forEach(b=>b.setAttribute('aria-expanded','false'));
+  function open(){lastFocus=document.activeElement;document.body.classList.add('menu-open','no-scroll');drawer?.setAttribute('aria-hidden','false');if(backdrop)backdrop.hidden=false;drawer?.querySelector(focusables)?.focus?.()}
+  function close(){document.body.classList.remove('menu-open','no-scroll');drawer?.setAttribute('aria-hidden','true');if(backdrop)backdrop.hidden=true;lastFocus?.focus?.()}
+  openBtn?.addEventListener('click',open); closeBtn?.addEventListener('click',close); backdrop?.addEventListener('click',close);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+  drawer?.addEventListener('click',e=>{const btn=e.target.closest('.m-drop');if(!btn)return;const id=btn.getAttribute('aria-controls')||btn.dataset.target?.replace('#','');const panel=id?document.getElementById(id):null;if(!panel)return;const ex=btn.getAttribute('aria-expanded')==='true';btn.setAttribute('aria-expanded',String(!ex));panel.hidden=ex?true:false});
+  drawer?.addEventListener('click',e=>{const a=e.target.closest('a');if(a)close()});
+
+  // Tabs & controls
+  $('#tab-individual').addEventListener('click',()=>{state.tab='individual';toggleTabs();board()});
+  $('#tab-unit').addEventListener('click',()=>{state.tab='unit';toggleTabs();board()});
+  $('#range').addEventListener('change',e=>{state.range=e.target.value;board()});
+  $('#sort').addEventListener('change',e=>{state.sort=e.target.value;board()});
+  $('#exam').addEventListener('change',e=>{state.examId=e.target.value;board()});
+  $('#btnRefresh').addEventListener('click',board);
+  $('#q').addEventListener('input',debounce(e=>{state.q=e.target.value.trim();board()},200));
+  headerByTab();
+
+  // Load danh sách kỳ thi
+  exams().then(list=>{
+    list.forEach(ex=>{const o=document.createElement('option');o.value=ex.id;o.textContent=ex.title||ex.id;$('#exam').appendChild(o)})
+  }).catch(e=>console.warn('Load exams lỗi:',e));
+
+  board(); setInterval(board, AUTO_REFRESH_MS);
+})();
+
+function toggleTabs(){
+  $('#tab-individual').classList.toggle('active', state.tab==='individual');
+  $('#tab-unit').classList.toggle('active', state.tab==='unit');
+  headerByTab();
+}
 </script>
 </body>
 </html>
